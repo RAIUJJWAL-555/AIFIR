@@ -7,6 +7,9 @@ import DashboardLayout from './components/layout/DashboardLayout';
 import UserDashboard from './pages/user/UserDashboard';
 import RegisterComplaint from './pages/user/RegisterComplaint';
 import PoliceDashboard from './pages/police/PoliceDashboard';
+import ReviewComplaints from './pages/police/ReviewComplaints';
+import FIRManagement from './pages/police/FIRManagement';
+import OfficerAssignment from './pages/police/OfficerAssignment';
 
 import Home from './pages/Home';
 
@@ -63,9 +66,9 @@ function App() {
               </ProtectedRoute>
             }>
               <Route path="dashboard" element={<PoliceDashboard />} />
-              <Route path="review" element={<div>Review Complaints Page</div>} />
-              <Route path="firs" element={<div>FIR Management Page</div>} />
-              <Route path="assign" element={<div>Officer Assignment Page</div>} />
+              <Route path="review" element={<ReviewComplaints />} />
+              <Route path="firs" element={<FIRManagement />} />
+              <Route path="assign" element={<OfficerAssignment />} />
             </Route>
 
           </Routes>
