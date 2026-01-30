@@ -10,7 +10,8 @@ import {
     ShieldCheck,
     UserCheck,
     FileBadge,
-    UserPlus
+    UserPlus,
+    BarChart2
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -30,6 +31,7 @@ const Sidebar = () => {
         { name: 'Review Complaints', path: '/admin/review', icon: FileText },
         { name: 'Officer Assignment', path: '/admin/assign', icon: UserCheck },
         { name: 'FIR Management', path: '/admin/firs', icon: FileBadge },
+        { name: 'Analytics', path: '/admin/analytics', icon: BarChart2 },
         { name: 'Register Officer', path: '/admin/officers/register', icon: UserPlus },
     ];
 

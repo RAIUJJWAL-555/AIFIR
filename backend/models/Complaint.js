@@ -50,6 +50,13 @@ const complaintSchema = mongoose.Schema({
     type: String,
     required: false
   },
+  
+  // AI-Assisted Classification
+  crimeType: { type: String, default: "Unclassified" }, 
+  lethality: { type: String, default: "Unknown" },
+  crimeConfidence: { type: Number, default: 0 },
+  lethalityConfidence: { type: Number, default: 0 },
+
   assignedOfficer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Admin',

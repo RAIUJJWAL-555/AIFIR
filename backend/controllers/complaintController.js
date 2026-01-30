@@ -37,6 +37,28 @@ const createComplaint = asyncHandler(async (req, res) => {
     throw new Error('Please fill in all required fields');
   }
 
+  // AI Classification
+  let aiAnalysis = {
+    crimeType: "Unclassified",
+    lethality: "Unknown",
+    crimeConfidence: 0,
+    lethalityConfidence: 0
+  };
+
+  try {
+    const aiResponse = await fetch("http://localhost:8000/classify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ description })
+    });
+    
+    if (aiResponse.ok) {
+        aiAnalysis = await aiResponse.json();
+    }
+  } catch (error) {
+    console.log("AI Service Unavailable:", error.message);
+  }
+
   const complaint = await Complaint.create({
     user: req.user.id,
     onModel: req.user.role === 'citizen' ? 'Citizen' : 'Admin',
@@ -47,7 +69,13 @@ const createComplaint = asyncHandler(async (req, res) => {
     incidentDate,
     incidentTime,
     aiDraft, // Optional, can be added if generated
-    evidence
+    evidence,
+    
+    // AI Fields
+    crimeType: aiAnalysis.crimeType,
+    lethality: aiAnalysis.lethality,
+    crimeConfidence: aiAnalysis.crimeConfidence,
+    lethalityConfidence: aiAnalysis.lethalityConfidence
   });
 
   res.status(201).json(complaint);

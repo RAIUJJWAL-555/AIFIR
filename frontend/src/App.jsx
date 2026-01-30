@@ -15,6 +15,7 @@ import OfficerAssignment from './pages/police/OfficerAssignment';
 import OfficerDashboard from './pages/police/OfficerDashboard';
 import CaseDetails from './pages/police/CaseDetails';
 import RegisterOfficer from './pages/police/RegisterOfficer';
+import AnalyticsDashboard from './pages/admin/AnalyticsDashboard';
 
 import Home from './pages/Home';
 
@@ -74,7 +75,11 @@ function App() {
                 <DashboardLayout />
               </ProtectedRoute>
             }>
+              import AnalyticsDashboard from './pages/admin/AnalyticsDashboard';
+
+              // ... (in Admin Routes)
               <Route path="dashboard" element={<PoliceDashboard />} /> {/* Reusing PoliceDashboard for Admin for now */}
+              <Route path="analytics" element={<AnalyticsDashboard />} />
               <Route path="assign" element={<OfficerAssignment />} />
               <Route path="review" element={<ReviewComplaints />} />
               <Route path="officers/register" element={<RegisterOfficer />} />

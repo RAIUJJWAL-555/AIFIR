@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 
 const AuthContext = createContext();
 
@@ -25,21 +25,6 @@ export const AuthProvider = ({ children }) => {
             setUser({ token, role, name });
         }
         setLoading(false);
-
-        // Axios Interceptor to handle 401 globally
-        const interceptor = axios.interceptors.response.use(
-            (response) => response,
-            (error) => {
-                if (error.response && error.response.status === 401) {
-                    // Token expired or invalid (e.g., db reset)
-                    logout();
-                    window.location.href = '/login'; // Force redirect
-                }
-                return Promise.reject(error);
-            }
-        );
-
-        return () => axios.interceptors.response.eject(interceptor);
     }, []);
 
     const login = async (role, identifier, password) => {
@@ -53,7 +38,7 @@ export const AuthProvider = ({ children }) => {
             }
             body.password = password;
 
-            const response = await axios.post('http://localhost:5000/api/auth/login', body);
+            const response = await api.post('/auth/login', body);
 
             const data = response.data;
 
