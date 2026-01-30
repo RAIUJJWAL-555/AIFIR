@@ -9,27 +9,39 @@ import {
     LogOut,
     ShieldCheck,
     UserCheck,
-    FileBadge
+    FileBadge,
+    UserPlus
 } from 'lucide-react';
 
 const Sidebar = () => {
     const { user, logout } = useAuth();
     const location = useLocation();
 
+    // Citizen Links
     const userLinks = [
         { name: 'Dashboard', path: '/user/dashboard', icon: LayoutDashboard },
         { name: 'Register Complaint', path: '/user/register', icon: PlusCircle },
         { name: 'My Complaints', path: '/user/status', icon: History },
     ];
 
-    const policeLinks = [
-        { name: 'Dashboard', path: '/police/dashboard', icon: LayoutDashboard },
-        { name: 'Review Complaints', path: '/police/review', icon: FileText },
-        { name: 'FIR Management', path: '/police/firs', icon: FileBadge },
-        { name: 'Officer Assignment', path: '/police/assign', icon: UserCheck },
+    // Admin (Assigner) Links
+    const adminLinks = [
+        { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
+        { name: 'Review Complaints', path: '/admin/review', icon: FileText },
+        { name: 'Officer Assignment', path: '/admin/assign', icon: UserCheck },
+        { name: 'FIR Management', path: '/admin/firs', icon: FileBadge },
+        { name: 'Register Officer', path: '/admin/officers/register', icon: UserPlus },
     ];
 
-    const links = user?.role === 'police' ? policeLinks : userLinks;
+    // Police (Officer) Links
+    const policeLinks = [
+        { name: 'My Assigned Cases', path: '/police/my-cases', icon: LayoutDashboard },
+        // Officers don't see assign or global review
+    ];
+
+    let links = userLinks;
+    if (user?.role === 'admin') links = adminLinks;
+    if (user?.role === 'police') links = policeLinks;
 
     return (
         <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-slate-200 bg-white">

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
@@ -25,6 +25,7 @@ const StatCard = ({ title, value, icon: Icon, color, subtext }) => (
 
 const PoliceDashboard = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState(null);
     const [recentComplaints, setRecentComplaints] = useState([]);
@@ -32,7 +33,7 @@ const PoliceDashboard = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const token = localStorage.getItem('token');
+                const token = sessionStorage.getItem('token');
                 const config = {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -132,7 +133,13 @@ const PoliceDashboard = () => {
                                                             'bg-slate-200 text-slate-600'}`}>
                                                     {c.status}
                                                 </span>
-                                                <Button size="sm" variant="outline">Review</Button>
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() => navigate(`/admin/case/${c._id}`)}
+                                                >
+                                                    Review
+                                                </Button>
                                             </div>
                                         </div>
                                     ))

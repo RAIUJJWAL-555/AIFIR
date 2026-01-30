@@ -1,0 +1,22 @@
+[
+  {
+    "questions": ["FIR kaise kare", "complaint kaise file kare"],
+    "answer": "FIR file karne ke liye login kare, Register Complaint page par jaakar incident details bhare. Police verification ke baad FIR register hoti hai."
+  },
+  {
+    "questions": ["FIR status kaise check kare", "complaint track kaise kare"],
+    "answer": "FIR status check karne ke liye login kare aur Dashboard me 'My Complaints' section me jaye."
+  },
+  {
+    "questions": ["FIR ke liye kya documents chahiye"],
+    "answer": "ID proof aur incident ki basic details chahiye jaise ki incident type, date, time, location, description etc. Evidence optional hota hai."
+  },
+  {
+    "questions": ["Officer ki details kha pta kre"],
+    "answer": "Aap sabse pahle apna account login kre uske baad dashboard se complain ID copy kro aur fir usko my complaint me jaker track kro"
+  },
+  {
+    "questions": ["hi", "hello", "namaste", "hey"],
+    "answer": "Namaste! Main aapki AI Assistant hu. Aap mujhse FIR aur complaints ke baare mein pooch sakte hain."
+  }
+]

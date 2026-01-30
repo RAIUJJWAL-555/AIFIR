@@ -6,10 +6,15 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import DashboardLayout from './components/layout/DashboardLayout';
 import UserDashboard from './pages/user/UserDashboard';
 import RegisterComplaint from './pages/user/RegisterComplaint';
+import ComplaintStatus from './pages/user/ComplaintStatus';
+import ComplaintDetails from './pages/user/ComplaintDetails';
 import PoliceDashboard from './pages/police/PoliceDashboard';
 import ReviewComplaints from './pages/police/ReviewComplaints';
 import FIRManagement from './pages/police/FIRManagement';
 import OfficerAssignment from './pages/police/OfficerAssignment';
+import OfficerDashboard from './pages/police/OfficerDashboard';
+import CaseDetails from './pages/police/CaseDetails';
+import RegisterOfficer from './pages/police/RegisterOfficer';
 
 import Home from './pages/Home';
 
@@ -25,21 +30,25 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     // Redirect to their appropriate dashboard if they try to access wrong one
-    return <Navigate to={user.role === 'police' ? '/police/dashboard' : '/user/dashboard'} />;
+    if (user.role === 'admin') return <Navigate to="/admin/dashboard" />;
+    if (user.role === 'police') return <Navigate to="/police/my-cases" />;
+    return <Navigate to="/user/dashboard" />;
   }
 
   return children;
 };
 
-import { Toaster } from 'react-hot-toast';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 import ErrorBoundary from './components/ErrorBoundary';
+import Chatbot from './components/chatbot/Chatbot';
 
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <Toaster position="top-center" reverseOrder={false} />
+        <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -55,23 +64,37 @@ function App() {
             }>
               <Route path="dashboard" element={<UserDashboard />} />
               <Route path="register" element={<RegisterComplaint />} />
-              <Route path="status" element={<div>Complaint Status Page</div>} />
-              <Route path="complaint/:id" element={<div>Complaint Details</div>} />
+              <Route path="status" element={<ComplaintStatus />} />
+              <Route path="complaint/:id" element={<ComplaintDetails />} />
             </Route>
 
-            {/* Police Routes */}
+            {/* Admin Routes (Assigners) */}
+            <Route path="/admin" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }>
+              <Route path="dashboard" element={<PoliceDashboard />} /> {/* Reusing PoliceDashboard for Admin for now */}
+              <Route path="assign" element={<OfficerAssignment />} />
+              <Route path="review" element={<ReviewComplaints />} />
+              <Route path="officers/register" element={<RegisterOfficer />} />
+              <Route path="case/:id" element={<CaseDetails />} />
+              <Route path="firs" element={<FIRManagement />} />
+            </Route>
+
+            {/* Police Routes (Officers) */}
             <Route path="/police" element={
               <ProtectedRoute allowedRoles={['police']}>
                 <DashboardLayout />
               </ProtectedRoute>
             }>
-              <Route path="dashboard" element={<PoliceDashboard />} />
-              <Route path="review" element={<ReviewComplaints />} />
-              <Route path="firs" element={<FIRManagement />} />
-              <Route path="assign" element={<OfficerAssignment />} />
+              <Route path="my-cases" element={<OfficerDashboard />} />
+              <Route path="case/:id" element={<CaseDetails />} />
+              {/* Police can't see assign page */}
             </Route>
 
           </Routes>
+          <Chatbot />
         </Router>
       </AuthProvider>
     </ErrorBoundary>

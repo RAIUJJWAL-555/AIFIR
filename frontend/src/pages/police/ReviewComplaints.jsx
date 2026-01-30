@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import { FileText, CheckCircle, XCircle, Filter, Search, ChevronDown } from 'lucide-react';
 
 const ReviewComplaints = () => {
+    const navigate = useNavigate();
     const [complaints, setComplaints] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('Pending');
@@ -118,6 +120,14 @@ const ReviewComplaints = () => {
                                             </td>
                                             <td className="px-4 py-3 text-right">
                                                 <div className="flex items-center justify-end gap-2">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="text-primary-600 border-primary-100 hover:bg-primary-50"
+                                                        onClick={() => navigate(`/admin/case/${c._id}`)}
+                                                    >
+                                                        View
+                                                    </Button>
                                                     <Button
                                                         size="sm"
                                                         variant="ghost"

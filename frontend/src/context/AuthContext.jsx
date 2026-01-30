@@ -25,15 +25,35 @@ export const AuthProvider = ({ children }) => {
             setUser({ token, role, name });
         }
         setLoading(false);
+
+        // Axios Interceptor to handle 401 globally
+        const interceptor = axios.interceptors.response.use(
+            (response) => response,
+            (error) => {
+                if (error.response && error.response.status === 401) {
+                    // Token expired or invalid (e.g., db reset)
+                    logout();
+                    window.location.href = '/login'; // Force redirect
+                }
+                return Promise.reject(error);
+            }
+        );
+
+        return () => axios.interceptors.response.eject(interceptor);
     }, []);
 
-    const login = async (role, email, password) => {
+    const login = async (role, identifier, password) => {
         try {
             setLoading(true);
-            const response = await axios.post('http://localhost:5000/api/auth/login', {
-                email,
-                password
-            });
+            const body = {};
+            if (role === 'police') {
+                body.badgeId = identifier;
+            } else {
+                body.email = identifier;
+            }
+            body.password = password;
+
+            const response = await axios.post('http://localhost:5000/api/auth/login', body);
 
             const data = response.data;
 

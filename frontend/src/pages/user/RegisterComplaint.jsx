@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -18,6 +18,34 @@ const RegisterComplaint = () => {
     });
     const [isGenerating, setIsGenerating] = useState(false);
     const [generatedDraft, setGeneratedDraft] = useState('');
+    const [uploading, setUploading] = useState(false);
+    const [evidence, setEvidence] = useState('');
+
+    const uploadFileHandler = async (e) => {
+        const file = e.target.files[0];
+        const formData = new FormData();
+        formData.append('evidence', file);
+        setUploading(true);
+
+        try {
+            const token = sessionStorage.getItem('token');
+            const config = {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    Authorization: `Bearer ${token}`
+                }
+            };
+
+            const { data } = await axios.post('http://localhost:5000/api/upload', formData, config);
+            setEvidence(data);
+            setUploading(false);
+            toast.success('Evidence uploaded successfully');
+        } catch (error) {
+            console.error(error);
+            setUploading(false);
+            toast.error('File upload failed');
+        }
+    };
 
     const handleAIAssist = async () => {
         if (!formData.description) return;
@@ -70,7 +98,8 @@ Sincerely,
                 incidentDate: formData.date,
                 incidentTime: formData.time,
                 location: formData.location,
-                aiDraft: generatedDraft
+                aiDraft: generatedDraft,
+                evidence: evidence
             }, config);
 
             toast.success('Complaint Submitted Successfully!');
@@ -207,11 +236,33 @@ Sincerely,
                     <Card>
                         <CardHeader><CardTitle>Evidence Upload</CardTitle></CardHeader>
                         <CardContent>
-                            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:bg-slate-50 transition-colors cursor-pointer">
+                            <label className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:bg-slate-50 transition-colors cursor-pointer block">
+                                <input
+                                    type="file"
+                                    className="hidden"
+                                    onChange={uploadFileHandler}
+                                    accept=".jpg,.jpeg,.png,.pdf"
+                                />
                                 <Upload className="mx-auto h-8 w-8 text-slate-400 mb-2" />
-                                <p className="text-sm font-medium text-slate-700">Click to upload</p>
-                                <p className="text-xs text-slate-500 mt-1">PDF, JPG, PNG (Max 5MB)</p>
-                            </div>
+                                {uploading ? (
+                                    <p className="text-sm font-medium text-primary-600 animate-pulse">Uploading...</p>
+                                ) : evidence ? (
+                                    <div className="space-y-1">
+                                        <p className="text-sm font-medium text-green-600">File Received!</p>
+                                        <p className="text-xs text-slate-500 truncate">{evidence.split('/').pop()}</p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <p className="text-sm font-medium text-slate-700">Click to upload</p>
+                                        <p className="text-xs text-slate-500 mt-1">PDF, JPG, PNG (Max 5MB)</p>
+                                    </>
+                                )}
+                            </label>
+                            {evidence && (
+                                <p className="text-[10px] text-slate-400 mt-2 text-center">
+                                    Evidence attached to report
+                                </p>
+                            )}
                         </CardContent>
                     </Card>
 

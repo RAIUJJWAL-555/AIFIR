@@ -3,37 +3,58 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Ca
 import Button from '../../components/ui/Button';
 import { UserCheck, Shield, ChevronRight } from 'lucide-react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const OfficerAssignment = () => {
     // Mock officers for now since we don't have an endpoint
-    const officers = [
-        { id: '1', name: 'Insp. Vikram Singh', badge: 'POLICE-007', status: 'Available', cases: 2 },
-        { id: '2', name: 'Sub-Insp. Aditi Rao', badge: 'POLICE-042', status: 'On Duty', cases: 5 },
-        { id: '3', name: 'Constable Rajesh Kumar', badge: 'POLICE-108', status: 'Busy', cases: 8 },
-    ];
+    const [officers, setOfficers] = useState([]);
+    const [selectedOfficer, setSelectedOfficer] = useState({}); // { caseId: officerId }
 
     const [unassignedCases, setUnassignedCases] = useState([]);
+    const [pendingCount, setPendingCount] = useState(0);
 
     useEffect(() => {
-        const fetchCases = async () => {
+        const fetchData = async () => {
             try {
                 const token = sessionStorage.getItem('token');
-                const response = await axios.get('http://localhost:5000/api/complaints/all', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                // Filter for FIRs that are 'FIR Registered' but not 'assigned' (mock logic since no assigned field used yet really)
-                // For demo, just show all 'FIR Registered'
-                setUnassignedCases(response.data.filter(c => c.status === 'FIR Registered'));
+                const config = { headers: { Authorization: `Bearer ${token}` } };
+
+                // Fetch Complaints
+                const complaintsRes = await axios.get('http://localhost:5000/api/complaints/all', config);
+                // Filter for FIRs that are not resolved or rejected
+                setUnassignedCases(complaintsRes.data.filter(c =>
+                    (c.status === 'FIR Registered' || c.status === 'Under Review') && !c.assignedOfficer
+                ));
+                setPendingCount(complaintsRes.data.filter(c => c.status === 'Pending').length);
+
+                // Fetch Officers
+                const officersRes = await axios.get('http://localhost:5000/api/admin/officers', config);
+                setOfficers(officersRes.data);
             } catch (err) {
                 console.error(err);
             }
         };
-        fetchCases();
+        fetchData();
     }, []);
 
-    const handleAssign = (caseId, officerName) => {
-        alert(`Assigned Case ${caseId} to ${officerName}`);
-        // In real app, API call to update 'assignedOfficer' field
+    const handleAssign = async (caseId) => {
+        const officerId = selectedOfficer[caseId];
+        if (!officerId) return toast.warning('Please select an officer');
+
+        try {
+            const token = sessionStorage.getItem('token');
+            await axios.put(`http://localhost:5000/api/complaints/${caseId}`,
+                { assignedOfficer: officerId, status: 'FIR Registered' },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            // Remove from list
+            setUnassignedCases(current => current.filter(c => c._id !== caseId));
+            toast.success('Officer Assigned Successfully');
+        } catch (error) {
+            console.error(error);
+            toast.error('Failed to assign officer');
+        }
     };
 
     return (
@@ -42,6 +63,23 @@ const OfficerAssignment = () => {
                 <h1 className="text-3xl font-bold text-slate-900">Officer Assignment</h1>
                 <p className="text-slate-500 mt-1">Delegate incoming FIRs to investigating officers.</p>
             </div>
+
+            {pendingCount > 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-amber-100 rounded-full text-amber-600">
+                            <Shield className="h-5 w-5" />
+                        </div>
+                        <div>
+                            <p className="font-semibold text-amber-800">Action Required</p>
+                            <p className="text-sm text-amber-600">There are {pendingCount} complaints awaiting your approval before they can be assigned.</p>
+                        </div>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => window.location.href = '/admin/review'}>
+                        Go to Review
+                    </Button>
+                </div>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Available Officers List */}
@@ -55,14 +93,12 @@ const OfficerAssignment = () => {
                             <CardContent className="p-4 flex items-center justify-between">
                                 <div>
                                     <p className="font-medium text-slate-900">{officer.name}</p>
-                                    <p className="text-xs text-slate-500">{officer.badge}</p>
+                                    <p className="text-xs text-slate-500">{officer.badgeId}</p>
                                 </div>
                                 <div className="text-right">
-                                    <span className={`text-xs px-2 py-1 rounded-full ${officer.status === 'Available' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
-                                        }`}>
-                                        {officer.status}
+                                    <span className={`text-xs px-2 py-1 rounded-full bg-green-100 text-green-700`}>
+                                        Available
                                     </span>
-                                    <p className="text-xs text-slate-400 mt-1">{officer.cases} active cases</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -94,11 +130,15 @@ const OfficerAssignment = () => {
                                     <p className="text-sm text-slate-600 mb-4 bg-slate-50 p-3 rounded">{c.description}</p>
 
                                     <div className="flex items-center gap-2">
-                                        <select className="flex-1 text-sm border-slate-300 rounded-md py-2 px-3 bg-white border focus:ring-2 focus:ring-primary-500 outline-none">
-                                            <option>Select Officer...</option>
-                                            {officers.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+                                        <select
+                                            className="flex-1 text-sm border-slate-300 rounded-md py-2 px-3 bg-white border focus:ring-2 focus:ring-primary-500 outline-none"
+                                            onChange={(e) => setSelectedOfficer({ ...selectedOfficer, [c._id]: e.target.value })}
+                                            value={selectedOfficer[c._id] || ''}
+                                        >
+                                            <option value="">Select Officer...</option>
+                                            {officers.map(o => <option key={o._id} value={o._id}>{o.name}</option>)}
                                         </select>
-                                        <Button onClick={() => handleAssign(c._id.substring(c._id.length - 6), 'Selected Officer')}>
+                                        <Button onClick={() => handleAssign(c._id)}>
                                             Assign
                                         </Button>
                                     </div>

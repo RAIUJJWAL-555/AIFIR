@@ -6,6 +6,7 @@ const {
   createComplaint,
   getComplaintById,
   updateComplaintStatus,
+  getOfficerComplaints,
 } = require('../controllers/complaintController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -14,6 +15,7 @@ router.route('/')
   .post(protect, createComplaint);
 
 router.get('/all', protect, getAllComplaints);
+router.get('/officer/my', protect, getOfficerComplaints);
 
 router.route('/:id')
   .get(protect, getComplaintById)

@@ -112,6 +112,7 @@ const UserDashboard = () => {
                                         <th className="px-4 py-3 rounded-tl-lg">Complaint ID</th>
                                         <th className="px-4 py-3">Type</th>
                                         <th className="px-4 py-3">Date</th>
+                                        <th className="px-4 py-3">Assigned Officer</th>
                                         <th className="px-4 py-3">Status</th>
                                         <th className="px-4 py-3 rounded-tr-lg">Action</th>
                                     </tr>
@@ -125,6 +126,9 @@ const UserDashboard = () => {
                                             <td className="px-4 py-3">{complaint.incidentType}</td>
                                             <td className="px-4 py-3 text-slate-500">
                                                 {new Date(complaint.createdAt).toLocaleDateString()}
+                                            </td>
+                                            <td className="px-4 py-3 text-slate-500">
+                                                {complaint.assignedOfficer ? complaint.assignedOfficer.name : 'Pending Assignment'}
                                             </td>
                                             <td className="px-4 py-3">
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize

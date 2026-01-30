@@ -1,6 +1,6 @@
 const asyncHandler = require('express-async-handler');
 const Complaint = require('../models/Complaint');
-const User = require('../models/User');
+const Admin = require('../models/Admin');
 
 // @desc    Get Admin Dashboard Stats
 // @route   GET /api/admin/stats
@@ -51,6 +51,72 @@ const getDashboardStats = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc    Get All Officers
+// @route   GET /api/admin/officers
+// @access  Private (Admin/Police)
+const getAllOfficers = asyncHandler(async (req, res) => {
+  if (req.user.role === 'citizen') {
+    res.status(403);
+    throw new Error('Not authorized');
+  }
+
+  const officers = await Admin.find({ role: 'police' }).select('-password');
+  res.status(200).json(officers);
+});
+
+// @desc    Register a new Police Officer
+// @route   POST /api/admin/officers
+// @access  Private (Admin only)
+const registerOfficer = asyncHandler(async (req, res) => {
+  if (req.user.role !== 'admin') {
+    res.status(403);
+    throw new Error('Not authorized. Only Admins can register officers.');
+  }
+
+  const { name, email, password, phone, badgeId } = req.body;
+
+  if (!name || !email || !password || !badgeId) {
+    res.status(400);
+    throw new Error('Please include name, email, password, and badge ID');
+  }
+
+  const officerExists = await Admin.findOne({ 
+    $or: [
+      { email },
+      { badgeId }
+    ] 
+  });
+
+  if (officerExists) {
+    res.status(400);
+    throw new Error('Officer with this email or badge ID already exists');
+  }
+
+  const officer = await Admin.create({
+    name,
+    email,
+    password,
+    phone,
+    badgeId,
+    role: 'police'
+  });
+
+  if (officer) {
+    res.status(201).json({
+      _id: officer._id,
+      name: officer.name,
+      email: officer.email,
+      badgeId: officer.badgeId,
+      role: officer.role
+    });
+  } else {
+    res.status(400);
+    throw new Error('Invalid officer data');
+  }
+});
+
 module.exports = {
   getDashboardStats,
+  getAllOfficers,
+  registerOfficer
 };

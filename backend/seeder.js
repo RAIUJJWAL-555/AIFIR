@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
-const User = require('./models/User');
+const Admin = require('./models/Admin');
 const Citizen = require('./models/Citizen');
 const Complaint = require('./models/Complaint');
 
@@ -11,7 +11,7 @@ connectDB();
 const importData = async () => {
     try {
         await Complaint.deleteMany();
-        await User.deleteMany();
+        await Admin.deleteMany();
         await Citizen.deleteMany();
 
         console.log('DB Cleared...');
@@ -27,25 +27,25 @@ const importData = async () => {
         });
 
         // 2. Create Officials (Police/Admin)
-        const admin = await User.create({
+        const admin = await Admin.create({
             name: 'System Admin',
             email: 'admin@police.gov.in',
             password: '123',
-            role: 'police', // Admin logic
+            role: 'admin', // The Assigner
             badgeId: 'POLICE-ADMIN-001',
             phone: '100'
         });
         
-         const officer = await User.create({
+         const officer = await Admin.create({
             name: 'Inspector Vikram',
             email: 'vikram@police.gov.in',
             password: '123',
-            role: 'police',
+            role: 'police', // The Investigator
             badgeId: 'POLICE-007',
             phone: '112'
         });
 
-        console.log('Users & Citizens Created.');
+        console.log('Admins & Citizens Created.');
 
         // 3. Create Complaints linked to Citizen
         await Complaint.create([

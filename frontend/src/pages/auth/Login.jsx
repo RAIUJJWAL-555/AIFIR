@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { ShieldCheck, User, Lock, ArrowRight } from 'lucide-react';
@@ -8,8 +8,8 @@ import Input from '../../components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 
 const Login = () => {
-    const [role, setRole] = useState('user'); // 'user' or 'police'
-    const [email, setEmail] = useState('');
+    const [role, setRole] = useState('citizen'); // 'citizen', 'police', 'admin'
+    const [identifier, setIdentifier] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const { login } = useAuth();
@@ -19,13 +19,15 @@ const Login = () => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const loggedInUser = await login(role, email, password);
+            const loggedInUser = await login(role, identifier, password);
             toast.success('Successfully logged in!');
             // Navigate based on returned role
             if (loggedInUser.role === 'citizen') {
                 navigate('/user/dashboard');
-            } else if (loggedInUser.role === 'police' || loggedInUser.role === 'admin') {
-                navigate('/police/dashboard');
+            } else if (loggedInUser.role === 'admin') {
+                navigate('/admin/dashboard');
+            } else if (loggedInUser.role === 'police') {
+                navigate('/police/my-cases');
             } else {
                 navigate('/'); // Fallback
             }
@@ -54,11 +56,11 @@ const Login = () => {
                     </CardHeader>
                     <CardContent>
                         {/* Role Switcher */}
-                        <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 rounded-lg mb-6">
+                        <div className="grid grid-cols-3 gap-2 p-1 bg-slate-100 rounded-lg mb-6">
                             <button
                                 type="button"
-                                onClick={() => setRole('user')}
-                                className={`py-2 text-sm font-medium rounded-md transition-all ${role === 'user'
+                                onClick={() => { setRole('citizen'); setIdentifier(''); }}
+                                className={`py-2 text-xs font-medium rounded-md transition-all ${role === 'citizen'
                                     ? 'bg-white text-primary-700 shadow-sm'
                                     : 'text-slate-500 hover:text-slate-700'
                                     }`}
@@ -67,13 +69,23 @@ const Login = () => {
                             </button>
                             <button
                                 type="button"
-                                onClick={() => setRole('police')}
-                                className={`py-2 text-sm font-medium rounded-md transition-all ${role === 'police'
+                                onClick={() => { setRole('police'); setIdentifier(''); }}
+                                className={`py-2 text-xs font-medium rounded-md transition-all ${role === 'police'
                                     ? 'bg-white text-primary-700 shadow-sm'
                                     : 'text-slate-500 hover:text-slate-700'
                                     }`}
                             >
-                                Official
+                                Officer
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => { setRole('admin'); setIdentifier(''); }}
+                                className={`py-2 text-xs font-medium rounded-md transition-all ${role === 'admin'
+                                    ? 'bg-white text-primary-700 shadow-sm'
+                                    : 'text-slate-500 hover:text-slate-700'
+                                    }`}
+                            >
+                                Admin
                             </button>
                         </div>
 
@@ -82,11 +94,11 @@ const Login = () => {
                                 <div className="relative">
                                     <User className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
                                     <Input
-                                        type={role === 'user' ? "email" : "text"}
-                                        placeholder={role === 'user' ? "Email address" : "Badge Number"}
+                                        type={role === 'police' ? "text" : "email"}
+                                        placeholder={role === 'police' ? "Badge Number" : "Email address"}
                                         className="pl-10"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        value={identifier}
+                                        onChange={(e) => setIdentifier(e.target.value)}
                                         required
                                     />
                                 </div>

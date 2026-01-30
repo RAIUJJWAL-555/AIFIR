@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const Admin = require('../models/Admin');
 const Citizen = require('../models/Citizen');
 
 const protect = async (req, res, next) => {
@@ -13,8 +13,8 @@ const protect = async (req, res, next) => {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Check User (Official) collection first
-      let user = await User.findById(decoded.id).select('-password');
+      // Check Admin (Official) collection first
+      let user = await Admin.findById(decoded.id).select('-password');
       
       // If not found, check Citizen collection
       if (!user) {

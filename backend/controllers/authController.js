@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const User = require('../models/User');
+const Admin = require('../models/Admin');
 const Citizen = require('../models/Citizen');
 
 // Generate JWT
@@ -18,10 +18,10 @@ const registerUser = async (req, res) => {
   }
 
   // Check existence in both collections
-  const userExists = await User.findOne({ email });
+  const adminExists = await Admin.findOne({ email });
   const citizenExists = await Citizen.findOne({ email });
 
-  if (userExists || citizenExists) {
+  if (adminExists || citizenExists) {
     return res.status(400).json({ message: 'User already exists' });
   }
 
@@ -36,11 +36,11 @@ const registerUser = async (req, res) => {
           phone
       });
   } else {
-      // Create Official (User)
+      // Create Official (Admin)
       if (role === 'police' && !badgeId) {
           return res.status(400).json({ message: 'Badge ID required for police' });
       }
-      user = await User.create({
+      user = await Admin.create({
           name,
           email,
           password,
@@ -64,14 +64,16 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, badgeId, password } = req.body;
 
-  // Try finding in User (Official) first
-  let user = await User.findOne({ email });
-  
-  // If not found, try Citizen
-  if (!user) {
-      user = await Citizen.findOne({ email });
+  let user;
+
+  if (badgeId) {
+    // Login with Badge ID (Police)
+    user = await Admin.findOne({ badgeId });
+  } else if (email) {
+    // Login with Email (Admin or Citizen)
+    user = await Admin.findOne({ email }) || await Citizen.findOne({ email });
   }
 
   if (user && (await user.matchPassword(password))) {
@@ -80,6 +82,7 @@ const loginUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      badgeId: user.badgeId,
       token: generateToken(user.id),
     });
   } else {

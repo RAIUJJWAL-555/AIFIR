@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import { FileBadge, Download, Printer, Eye } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const FIRManagement = () => {
     const [firs, setFirs] = useState([]);
@@ -31,7 +32,7 @@ const FIRManagement = () => {
     }, []);
 
     const generateMockPDF = (firId) => {
-        alert(`Generating PDF for FIR #${firId.substring(firId.length - 6).toUpperCase()}... (Mock Action)`);
+        toast.info(`Generating PDF for FIR #${firId.substring(firId.length - 6).toUpperCase()}...`);
     };
 
     return (

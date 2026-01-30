@@ -9,7 +9,7 @@ const complaintSchema = mongoose.Schema({
   onModel: {
     type: String,
     required: true,
-    enum: ['User', 'Citizen'],
+    enum: ['Admin', 'Citizen'],
     default: 'Citizen'
   },
   title: {
@@ -39,7 +39,7 @@ const complaintSchema = mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Pending', 'Under Review', 'FIR Registered', 'Rejected', 'Resolved'],
+    enum: ['Pending', 'Under Review', 'FIR Registered', 'Rejected', 'Solved by Officer', 'Resolved'],
     default: 'Pending'
   },
   evidence: {
@@ -52,7 +52,7 @@ const complaintSchema = mongoose.Schema({
   },
   assignedOfficer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: 'Admin',
     default: null
   }
 }, {
