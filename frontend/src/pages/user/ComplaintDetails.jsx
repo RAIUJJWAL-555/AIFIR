@@ -113,6 +113,34 @@ const ComplaintDetails = () => {
                             </CardContent>
                         </Card>
                     )}
+
+                    {/* Investigation Updates Timeline */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2 text-indigo-700">
+                                <Shield className="h-5 w-5" /> Investigation Updates
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-6">
+                                {complaint.investigationUpdates && complaint.investigationUpdates.length > 0 ? (
+                                    complaint.investigationUpdates.slice().reverse().map((update, idx) => (
+                                        <div key={idx} className="relative pl-6 pb-2 border-l-2 border-indigo-100 last:border-0">
+                                            <div className="absolute -left-[9px] top-0 h-4 w-4 rounded-full bg-indigo-500 ring-4 ring-white" />
+                                            <div>
+                                                <p className="text-sm text-slate-800 font-medium">{update.note}</p>
+                                                <p className="text-xs text-slate-400 mt-1">
+                                                    {new Date(update.updatedAt).toLocaleString()} • Officer {update.officerName || ''}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-sm text-slate-500 italic">No updates available yet.</p>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 {/* Sidebar Info */}

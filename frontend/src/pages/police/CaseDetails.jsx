@@ -5,7 +5,80 @@ import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
-import { ArrowLeft, MapPin, Calendar, Clock, User, Phone, Mail, FileText, CheckCircle, Shield, Paperclip, ExternalLink } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, Clock, User, Phone, Mail, FileText, CheckCircle, Shield, Paperclip, ExternalLink, Lightbulb, TrendingUp } from 'lucide-react';
+
+const SimilarCases = ({ description }) => {
+    const [similar, setSimilar] = useState([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchSimilar = async () => {
+            setLoading(true);
+            try {
+                const token = sessionStorage.getItem('token');
+                const res = await axios.post('http://localhost:5000/api/complaints/similar',
+                    { description },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                setSimilar(res.data);
+            } catch (error) {
+                console.error("Error fetching similar cases:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (description) fetchSimilar();
+    }, [description]);
+
+    if (!description) return null;
+
+    return (
+        <Card className="border-t-4 border-t-amber-500 shadow-sm">
+            <CardHeader className="pb-2">
+                <CardTitle className="text-lg flex items-center gap-2 text-amber-700">
+                    <Lightbulb className="h-5 w-5" /> AI Insights: Similar Resolved Cases
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="space-y-4">
+                    {loading ? (
+                        <p className="text-sm text-slate-500 animate-pulse">Analyzing patterns...</p>
+                    ) : similar.length === 0 ? (
+                        <p className="text-sm text-slate-500">No similar solved cases found.</p>
+                    ) : (
+                        similar.map(c => (
+                            <div key={c._id} className="p-3 bg-amber-50 rounded-lg border border-amber-100 hover:border-amber-300 transition-colors">
+                                <div className="flex justify-between items-start mb-2">
+                                    <h4 className="font-semibold text-slate-800 text-sm">{c.incidentType}</h4>
+                                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Resolved</span>
+                                </div>
+                                <p className="text-xs text-slate-600 line-clamp-2 mb-2">{c.description}</p>
+
+                                {c.investigationUpdates && c.investigationUpdates.length > 0 && (
+                                    <div className="bg-white p-2 rounded border border-amber-100 mb-2">
+                                        <p className="text-xs text-slate-500 font-medium mb-1">Resolution Note:</p>
+                                        <p className="text-xs text-slate-700 italic">"{c.investigationUpdates[c.investigationUpdates.length - 1].note}"</p>
+                                    </div>
+                                )}
+
+                                <div className="flex items-center gap-2 text-xs text-slate-500 mt-2 border-t border-amber-200 pt-2">
+                                    <User className="h-3 w-3" />
+                                    <span>Officer: {c.assignedOfficer?.name || 'Unknown'}</span>
+                                    {c.assignedOfficer?.phone && (
+                                        <span className="flex items-center gap-1 ml-auto text-blue-600 font-medium cursor-pointer hover:underline">
+                                            <Phone className="h-3 w-3" /> {c.assignedOfficer.phone}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
 
 const CaseDetails = () => {
     const { id } = useParams();
@@ -14,6 +87,27 @@ const CaseDetails = () => {
     const [caseData, setCaseData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
+    const [newNote, setNewNote] = useState("");
+
+    const handleAddNote = async () => {
+        if (!newNote.trim()) return;
+        setUpdating(true);
+        try {
+            const token = sessionStorage.getItem('token');
+            const res = await axios.post(`http://localhost:5000/api/complaints/${id}/notes`,
+                { note: newNote },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setCaseData(res.data);
+            setNewNote("");
+            toast.success("Note added successfully");
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to add note");
+        } finally {
+            setUpdating(false);
+        }
+    };
 
     useEffect(() => {
         const fetchCaseDetails = async () => {
@@ -170,6 +264,8 @@ const CaseDetails = () => {
                             )}
                         </CardContent>
                     </Card>
+
+                    <SimilarCases description={caseData.description} />
                 </div>
 
                 {/* Right Column: Complainant Info & Actions */}
@@ -234,16 +330,40 @@ const CaseDetails = () => {
                     <Card>
                         <CardHeader className="bg-slate-50 border-b border-slate-100">
                             <CardTitle className="text-lg flex items-center gap-2">
-                                <Shield className="h-5 w-5 text-indigo-600" /> Official Notes
+                                <Shield className="h-5 w-5 text-indigo-600" /> Investigation Timeline
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="p-6">
+                            <div className="space-y-4 mb-4 max-h-60 overflow-y-auto">
+                                {caseData.investigationUpdates && caseData.investigationUpdates.length > 0 ? (
+                                    caseData.investigationUpdates.slice().reverse().map((update, idx) => (
+                                        <div key={idx} className="bg-slate-50 p-3 rounded border border-slate-100 text-sm">
+                                            <p className="text-slate-800">{update.note}</p>
+                                            <p className="text-xs text-slate-400 mt-2 flex justify-between">
+                                                <span>By: {update.officerName || 'Officer'}</span>
+                                                <span>{new Date(update.updatedAt).toLocaleString()}</span>
+                                            </p>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-sm text-slate-400 text-center py-2">No investigation notes yet.</p>
+                                )}
+                            </div>
+
                             <textarea
-                                className="w-full h-32 p-3 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none"
-                                placeholder="Add investigation notes here..."
+                                className="w-full h-24 p-3 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none"
+                                placeholder="Add update/note about investigation..."
+                                value={newNote}
+                                onChange={(e) => setNewNote(e.target.value)}
                             ></textarea>
-                            <Button size="sm" className="w-full mt-3 bg-indigo-600 hover:bg-indigo-700">
-                                Save Notes
+                            <Button
+                                size="sm"
+                                className="w-full mt-3 bg-indigo-600 hover:bg-indigo-700"
+                                onClick={handleAddNote}
+                                isLoading={updating}
+                                disabled={!newNote.trim()}
+                            >
+                                Add Note
                             </Button>
                         </CardContent>
                     </Card>

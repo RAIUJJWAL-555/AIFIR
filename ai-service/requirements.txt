@@ -3,3 +3,5 @@ uvicorn
 sentence-transformers
 torch
 transformers
+# cd ai-service
+# uvicorn app:app --reload --port 8000

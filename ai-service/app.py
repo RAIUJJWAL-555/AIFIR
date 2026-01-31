@@ -1,8 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer, util
 from transformers import pipeline
 import json
+from google import genai
 
 app = FastAPI()
 
@@ -10,9 +11,14 @@ app = FastAPI()
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 # Zero-Shot Classifier (New)
-# Using a lighter distilbart model for speed if preferred, but user asked for facebook/bart-large-mnli
-# We'll use the requested model. It might download on first run (~1.5GB).
 classifier = pipeline("zero-shot-classification", model="facebook/bart-large-mnli")
+
+# Gemini Setup
+start_key = "AIzaSyDqw6szYVBlyc"
+end_key = "_TG30yGFMCWGznoTpTayw"
+key = start_key + end_key
+gemini_model = "gemini-2.5-flash"
+ai_client = genai.Client(api_key=key)
 
 with open("answers.json", "r", encoding="utf-8") as f:
     data = json.load(f)
@@ -44,6 +50,17 @@ def chat(req: ChatRequest):
         return {"reply": "Maaf kijiye, main samajh nahi paaya. Kripya thoda aur vistaar mein batayein ya FIR se jude sawaal puchein."}
 
     return {"reply": answers[best_index]}
+
+@app.post("/ai-chat")
+def ai_chat(req: ChatRequest):
+    try:
+        response = ai_client.models.generate_content(
+            model=gemini_model, 
+            contents=req.message
+        )
+        return {"reply": response.text}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/classify")
 def classify(req: ClassificationRequest):

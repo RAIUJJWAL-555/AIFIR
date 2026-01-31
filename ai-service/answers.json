@@ -1,22 +1,22 @@
 [
   {
-    "questions": ["FIR kaise kare", "complaint kaise file kare"],
-    "answer": "FIR file karne ke liye login kare, Register Complaint page par jaakar incident details bhare. Police verification ke baad FIR register hoti hai."
+    "questions": ["How to file an FIR?", "FIR kaise kare?", "File FIR", "Register Complaint"],
+    "answer": "FIR file karne ke liye sabse pehle login karein. Phir 'Register Complaint' page par jakar incident ki details bharein. Police verification ke baad aapki FIR darj (register) ho jayegi."
   },
   {
-    "questions": ["FIR status kaise check kare", "complaint track kaise kare"],
-    "answer": "FIR status check karne ke liye login kare aur Dashboard me 'My Complaints' section me jaye."
+    "questions": ["How to check FIR status?", "FIR status kaise check kare?", "Check status"],
+    "answer": "Apni FIR ka status check karne ke liye login karein aur Dashboard mein 'My Complaints' section par jayein."
   },
   {
-    "questions": ["FIR ke liye kya documents chahiye"],
-    "answer": "ID proof aur incident ki basic details chahiye jaise ki incident type, date, time, location, description etc. Evidence optional hota hai."
+    "questions": ["What documents are required for FIR?", "FIR ke liye documents?", "Documents needed"],
+    "answer": "Aapko ek valid ID proof aur incident ki basic jaankari chahiye (jaise type, date, time, location). Agar koi saboot (photo/video) hai to wo bhi upload kar sakte hain."
   },
   {
-    "questions": ["Officer ki details kha pta kre"],
-    "answer": "Aap sabse pahle apna account login kre uske baad dashboard se complain ID copy kro aur fir usko my complaint me jaker track kro"
+    "questions": ["How to find Officer details?", "Officer ki detail kaise milegi?", "Contact Officer"],
+    "answer": "Sabse pehle login karein. Apne dashboard se Complaint ID copy karein aur 'My Complaints' mein jakar track karein. Wahan aapko assigned officer ki details mil jayengi."
   },
   {
-    "questions": ["hi", "hello", "namaste", "hey"],
-    "answer": "Namaste! Main aapki AI Assistant hu. Aap mujhse FIR aur complaints ke baare mein pooch sakte hain."
+    "questions": ["hi", "hello", "namaste", "hey", "help", "madad"],
+    "answer": "Namaste! Main aapka AI Assistant hu. Aap mujhse FIR file karne, status check karne ya kanooni jaankari ke baare mein pooch sakte hain."
   }
 ]

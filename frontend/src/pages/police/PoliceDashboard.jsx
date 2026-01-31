@@ -104,7 +104,7 @@ const PoliceDashboard = () => {
                     <Card className="h-full">
                         <CardHeader className="flex flex-row items-center justify-between">
                             <CardTitle>Incoming Complaints</CardTitle>
-                            <Link to="/police/review">
+                            <Link to="/admin/review">
                                 <Button variant="ghost" size="sm">View All <ArrowRight className="ml-1 h-4 w-4" /></Button>
                             </Link>
                         </CardHeader>

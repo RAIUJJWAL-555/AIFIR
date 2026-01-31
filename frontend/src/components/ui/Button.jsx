@@ -11,11 +11,12 @@ const Button = forwardRef(({
     ...props
 }, ref) => {
     const variants = {
-        primary: 'bg-primary-600 text-white hover:bg-primary-700 shadow-md ring-offset-2 focus:ring-2 focus:ring-primary-500',
-        secondary: 'bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 shadow-sm focus:ring-2 focus:ring-slate-200',
-        danger: 'bg-red-600 text-white hover:bg-red-700 shadow-md focus:ring-red-500',
-        ghost: 'bg-transparent text-slate-600 hover:bg-slate-100 hover:text-slate-900',
-        outline: 'bg-transparent border border-primary-600 text-primary-600 hover:bg-primary-50'
+        primary: 'bg-primary-700 text-white hover:bg-primary-800 shadow-sm border border-transparent focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
+        secondary: 'bg-white text-gray-700 border border-secondary-300 hover:bg-secondary-50 shadow-sm focus:ring-2 focus:ring-secondary-200',
+        danger: 'bg-red-700 text-white hover:bg-red-800 shadow-sm focus:ring-red-500',
+        ghost: 'bg-transparent text-gray-600 hover:bg-secondary-100 hover:text-gray-900',
+        outline: 'bg-transparent border-2 border-primary-700 text-primary-700 hover:bg-primary-50 font-semibold',
+        accent: 'bg-accent text-primary-900 hover:bg-yellow-500 font-bold uppercase tracking-wider shadow-sm'
     };
 
     const sizes = {
@@ -29,7 +30,7 @@ const Button = forwardRef(({
         <button
             ref={ref}
             className={cn(
-                'inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none',
+                'inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none disabled:opacity-50 disabled:pointer-events-none',
                 variants[variant],
                 sizes[size],
                 className

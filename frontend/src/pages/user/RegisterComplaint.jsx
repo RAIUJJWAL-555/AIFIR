@@ -20,6 +20,60 @@ const RegisterComplaint = () => {
     const [generatedDraft, setGeneratedDraft] = useState('');
     const [uploading, setUploading] = useState(false);
     const [evidence, setEvidence] = useState('');
+    const [isClassifying, setIsClassifying] = useState(false);
+
+    const handleAutoClassify = async () => {
+        if (!formData.description) return;
+
+        setIsClassifying(true);
+        try {
+            const token = sessionStorage.getItem('token');
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            };
+
+            const { data } = await axios.post('http://localhost:5000/api/ai/classify', {
+                description: formData.description
+            }, config);
+
+            if (data.success && data.ai) {
+                console.log("Frontend Received AI Data:", data.ai);
+
+                // Determine mapped type
+                const aiType = data.ai.crime_type?.trim();
+                const validTypes = ["Theft", "Cyber Crime", "Harassment", "Lost Property", "Fraud", "Robbery", "Assault", "Other"];
+
+                // Case-insensitive match attempt
+                const matchedType = validTypes.find(t => t.toLowerCase() === aiType?.toLowerCase());
+                const finalType = matchedType || "Other";
+
+                if (!matchedType) {
+                    console.warn(`AI returned unknown type: '${aiType}'. Defaulting to 'Other'.`);
+                }
+
+                setFormData(prev => ({
+                    ...prev,
+                    type: finalType
+                }));
+
+                toast.success(`AI Detected: ${finalType} (Severity: ${data.ai.severity})`);
+
+                // Also trigger draft generation automatically if not done
+                // Pass the finalType directly to ensure draft uses it
+                if (!generatedDraft) {
+                    handleAIAssist(finalType);
+                }
+            }
+
+        } catch (error) {
+            console.error("AI Classify Error:", error);
+            toast.error("Could not auto-classify. Please select manually.");
+        } finally {
+            setIsClassifying(false);
+        }
+    };
 
     const uploadFileHandler = async (e) => {
         const file = e.target.files[0];
@@ -47,17 +101,18 @@ const RegisterComplaint = () => {
         }
     };
 
-    const handleAIAssist = async () => {
+    const handleAIAssist = async (typeOverride = null) => {
+        const currentType = typeOverride || formData.type;
         if (!formData.description) return;
 
         setIsGenerating(true);
-        // Simulate AI Call
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Simulate AI Call (or we could use the AI endpoint here too if we wanted a better draft)
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
         setGeneratedDraft(`FIRST INFORMATION REPORT (DRAFT)
     
 Date: ${new Date().toLocaleDateString()}
-Subject: Complaint regarding ${formData.type || 'Instruction'}
+Subject: Complaint regarding ${currentType || 'Incident'}
 
 To,
 The Station House Officer,
@@ -65,12 +120,12 @@ Local Police Station,
 
 Respected Sir/Madam,
 
-I am writing to formally report an incident of ${formData.type || '...'} that occurred on ${formData.date} at approximately ${formData.time}.
+I am writing to formally report an incident of ${currentType || '...'} that occurred on ${formData.date || '[Date]'} at approximately ${formData.time || '[Time]'}.
 
 Details of the incident:
 ${formData.description}
 
-The incident took place at ${formData.location}.
+The incident took place at ${formData.location || '[Location]'}.
 
 I request you to kindly register an FIR and take necessary legal action.
 
@@ -135,6 +190,37 @@ Sincerely,
                         </CardHeader>
                         <CardContent>
                             <form onSubmit={handleSubmit} className="space-y-4">
+                                <div>
+                                    <div className="flex justify-between items-center mb-1.5">
+                                        <label className="block text-sm font-medium text-slate-700">
+                                            Describe the Incident
+                                        </label>
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            variant="accent"
+                                            onClick={handleAutoClassify}
+                                            isLoading={isClassifying}
+                                            disabled={!formData.description}
+                                            className="text-xs py-1 h-7"
+                                        >
+                                            <Sparkles className="mr-2 h-3 w-3" />
+                                            Auto-Fill Details
+                                        </Button>
+                                    </div>
+                                    <textarea
+                                        rows={6}
+                                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                        placeholder="Please describe exactly what happened. We will try to auto-detect the incident type."
+                                        value={formData.description}
+                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        required
+                                    />
+                                    <p className="mt-1 text-xs text-slate-500">
+                                        Be specific. Example: "My wallet was stolen near City Mall yesterday evening."
+                                    </p>
+                                </div>
+
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-1.5">
@@ -152,6 +238,8 @@ Sincerely,
                                             <option value="Harassment">Harassment</option>
                                             <option value="Lost Property">Lost Property</option>
                                             <option value="Fraud">Fraud</option>
+                                            <option value="Robbery">Robbery</option>
+                                            <option value="Assault">Assault</option>
                                             <option value="Other">Other</option>
                                         </select>
                                     </div>
@@ -179,35 +267,6 @@ Sincerely,
                                         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                                         required
                                     />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                                        Describe the Incident
-                                    </label>
-                                    <textarea
-                                        rows={6}
-                                        className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
-                                        placeholder="Please describe exactly what happened..."
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        required
-                                    />
-                                    <p className="mt-2 text-xs text-slate-500 flex items-center justify-between">
-                                        <span>Be as specific as possible.</span>
-                                        <Button
-                                            type="button"
-                                            size="sm"
-                                            variant="outline"
-                                            onClick={handleAIAssist}
-                                            isLoading={isGenerating}
-                                            disabled={!formData.description}
-                                            className="ml-auto"
-                                        >
-                                            <Sparkles className="mr-2 h-3 w-3" />
-                                            Generate FIR Draft
-                                        </Button>
-                                    </p>
                                 </div>
 
                                 {generatedDraft && (

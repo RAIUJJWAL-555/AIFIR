@@ -7,6 +7,8 @@ const {
   getComplaintById,
   updateComplaintStatus,
   getOfficerComplaints,
+  addInvestigationNote,
+  findSimilarCases
 } = require('../controllers/complaintController');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -15,7 +17,9 @@ router.route('/')
   .post(protect, createComplaint);
 
 router.get('/all', protect, getAllComplaints);
+router.post('/similar', protect, findSimilarCases); // New Route
 router.get('/officer/my', protect, getOfficerComplaints);
+router.post('/:id/notes', protect, addInvestigationNote);
 
 router.route('/:id')
   .get(protect, getComplaintById)

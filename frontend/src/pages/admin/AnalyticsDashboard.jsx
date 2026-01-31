@@ -10,20 +10,17 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF'];
 const AnalyticsDashboard = () => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await api.get('/admin/analytics'); // Changed to api/admin/analytics in server? no, we made a new route file.
-                // Wait, logic check: I mapped '/api/analytics' in server.js.
-                // I need to make sure the endpoint matches.
-                // Correction: In server.js I added app.use('/api/analytics', ...)
-                // So the endpoint is /api/analytics
-
+                // Ensure the endpoint matches backend route /api/analytics
                 const response = await api.get('/analytics');
                 setData(response.data);
-            } catch (error) {
-                console.error("Error fetching analytics:", error);
+            } catch (err) {
+                console.error("Error fetching analytics:", err);
+                setError(err.response?.data?.message || err.message || "Failed to load data");
             } finally {
                 setLoading(false);
             }
@@ -32,8 +29,16 @@ const AnalyticsDashboard = () => {
         fetchData();
     }, []);
 
-    if (loading) return <div className="p-8 text-center">Loading Analytics...</div>;
-    if (!data) return <div className="p-8 text-center">No Analytics Data Available</div>;
+    if (loading) return <div className="p-8 text-center text-slate-500">Loading Analytics...</div>;
+
+    if (error) return (
+        <div className="p-8 text-center text-red-500 bg-red-50 rounded-lg m-6 border border-red-200">
+            <h3 className="font-bold">Error Loading Analytics</h3>
+            <p>{error}</p>
+        </div>
+    );
+
+    if (!data) return <div className="p-8 text-center text-slate-500">No Analytics Data Available</div>;
 
     return (
         <div className="p-6 space-y-8 bg-slate-50 min-h-screen">

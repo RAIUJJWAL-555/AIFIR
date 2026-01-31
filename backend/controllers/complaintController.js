@@ -95,7 +95,10 @@ const getComplaintById = asyncHandler(async (req, res) => {
   }
 
   // Make sure user owns the complaint or is an official
-  if (req.user.id !== complaint.user._id.toString() && req.user.role === 'citizen') {
+  // Check if complaint.user exists (in case user was deleted)
+  const isOwner = complaint.user && req.user.id === complaint.user._id.toString();
+  
+  if (!isOwner && req.user.role === 'citizen') {
     res.status(401);
     throw new Error('User not authorized');
   }
@@ -145,6 +148,80 @@ const getOfficerComplaints = asyncHandler(async (req, res) => {
   res.status(200).json(complaints);
 });
 
+// @desc    Add Investigation Note
+// @route   POST /api/complaints/:id/notes
+// @access  Private (Police/Admin)
+const addInvestigationNote = asyncHandler(async (req, res) => {
+  const { note } = req.body;
+  const complaint = await Complaint.findById(req.params.id);
+
+  if (!complaint) {
+    res.status(404);
+    throw new Error('Complaint not found');
+  }
+
+  // Only Admin or Police can add notes
+  if (req.user.role === 'citizen') {
+    res.status(401);
+    throw new Error('Not authorized to add investigation notes');
+  }
+
+  const newNote = {
+    note,
+    officerName: req.user.name,
+    updatedAt: new Date()
+  };
+
+  complaint.investigationUpdates.push(newNote);
+  await complaint.save();
+
+  res.status(200).json(complaint);
+});
+
+// @desc    Find Similar Resolved Cases (AI Search)
+// @route   POST /api/complaints/similar
+// @access  Private (Police/Admin)
+const findSimilarCases = asyncHandler(async (req, res) => {
+  const { description } = req.body;
+  
+  if (!description) {
+      res.status(400);
+      throw new Error('Description is required for search');
+  }
+
+  try {
+      // 1. Get similar questions/answers from AI Service
+      const aiResponse = await fetch("http://localhost:8000/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: description })
+      });
+
+      // Note: The simple chat endpoint returns a single best answer. 
+      // For similar *cases*, we ideally need a vector search over previous complaints.
+      // However, per user request, we can simulate this or use the existing "chat" as a "Knowledge Base" search
+      // OR we can implement a basic text match on resolved cases in MongoDB if vector DB is not set up.
+      
+      // OPTION 2: MongoDB Text Search on Solved Cases
+      const similarComplaints = await Complaint.find(
+          { 
+              $text: { $search: description }, 
+              status: 'Resolved' 
+          },
+          { score: { $meta: "textScore" } }
+      )
+      .sort({ score: { $meta: "textScore" } })
+      .limit(3)
+      .populate('assignedOfficer', 'name phone');
+
+      res.status(200).json(similarComplaints);
+
+  } catch (error) {
+      console.error("Search Error:", error);
+      res.status(500).json([]);
+  }
+});
+
 module.exports = {
   getAllComplaints,
   getMyComplaints,
@@ -152,4 +229,6 @@ module.exports = {
   getComplaintById,
   updateComplaintStatus,
   getOfficerComplaints,
+  addInvestigationNote,
+  findSimilarCases
 };

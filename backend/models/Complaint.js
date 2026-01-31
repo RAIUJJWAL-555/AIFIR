@@ -61,9 +61,17 @@ const complaintSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Admin',
     default: null
-  }
+  },
+  investigationUpdates: [{
+    note: { type: String, required: true },
+    updatedAt: { type: Date, default: Date.now },
+    officerName: { type: String } 
+  }]
 }, {
   timestamps: true
 });
+
+// Add Text Index for Search
+complaintSchema.index({ description: 'text', title: 'text' });
 
 module.exports = mongoose.model('Complaint', complaintSchema);

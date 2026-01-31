@@ -8,6 +8,8 @@ const Chatbot = () => {
         { id: 1, text: "Hello! I'm your AI Assistant. How can I help you today?", sender: 'bot', time: new Date().toLocaleTimeString() }
     ]);
     const [inputValue, setInputValue] = useState('');
+    const [isAiMode, setIsAiMode] = useState(true); // Default to AI mode
+    const [language, setLanguage] = useState('en'); // 'en' or 'hi'
     const messagesEndRef = useRef(null);
 
     const toggleChat = () => setIsOpen(!isOpen);
@@ -20,14 +22,21 @@ const Chatbot = () => {
         scrollToBottom();
     }, [messages]);
 
-    const handleSendMessage = async (e) => {
-        e.preventDefault();
-        if (!inputValue.trim()) return;
+    useEffect(() => {
+        const handleFaqEvent = (e) => {
+            const question = e.detail;
+            sendMessageLogic(question);
+        };
+        document.addEventListener('send-faq', handleFaqEvent);
+        return () => document.removeEventListener('send-faq', handleFaqEvent);
+    }, [messages, isAiMode]);
 
-        const userMessage = inputValue;
+    const sendMessageLogic = async (text) => {
+        if (!text.trim()) return;
+
         const newUserMessage = {
             id: messages.length + 1,
-            text: userMessage,
+            text: text,
             sender: 'user',
             time: new Date().toLocaleTimeString()
         };
@@ -36,16 +45,14 @@ const Chatbot = () => {
         setInputValue('');
 
         try {
-            const response = await fetch("/api/chat", {
+            const endpoint = isAiMode ? "/api/chat/ai" : "/api/chat";
+            const response = await fetch(endpoint, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: userMessage })
+                body: JSON.stringify({ message: text })
             });
 
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
 
             const botResponse = {
@@ -58,14 +65,18 @@ const Chatbot = () => {
 
         } catch (error) {
             console.error("Chat Error:", error);
-            const errorResponse = {
+            setMessages(prev => [...prev, {
                 id: messages.length + 2,
-                text: "Sorry, I'm having trouble connecting to the server right now.",
+                text: "Sorry, I'm having trouble connecting to the server.",
                 sender: 'bot',
                 time: new Date().toLocaleTimeString()
-            };
-            setMessages(prev => [...prev, errorResponse]);
+            }]);
         }
+    };
+
+    const handleSendMessage = (e) => {
+        e.preventDefault();
+        sendMessageLogic(inputValue);
     };
 
     return (
@@ -87,7 +98,9 @@ const Chatbot = () => {
                                         <Bot className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg leading-none">AI Assistant</h3>
+                                        <h3 className="font-bold text-lg leading-none">
+                                            {isAiMode ? "Smart AI Assitant" : "Help Center"}
+                                        </h3>
                                         <div className="flex items-center space-x-1 mt-1">
                                             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
                                             <span className="text-xs text-blue-100 font-medium">Online</span>
@@ -95,6 +108,14 @@ const Chatbot = () => {
                                     </div>
                                 </div>
                                 <div className="flex items-center space-x-2 text-white/80">
+                                    {/* Mode Toggle */}
+                                    <button
+                                        onClick={() => setIsAiMode(!isAiMode)}
+                                        className="text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded transition-colors border border-white/10"
+                                        title={isAiMode ? "Switch to FAQ Mode" : "Switch to Smart AI"}
+                                    >
+                                        {isAiMode ? "Switch to FAQ" : "Switch to AI"}
+                                    </button>
                                     <button
                                         onClick={() => setIsOpen(false)}
                                         className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
@@ -108,7 +129,7 @@ const Chatbot = () => {
                             <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
                                 <div className="flex justify-center my-4">
                                     <div className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-xs py-1 px-3 rounded-full">
-                                        Today
+                                        Today • {isAiMode ? "AI Mode" : "FAQ Mode"}
                                     </div>
                                 </div>
 
@@ -143,15 +164,50 @@ const Chatbot = () => {
                                     </motion.div>
                                 ))}
 
-                                {messages.length === 1 && (
-                                    <div className="grid grid-cols-2 gap-2 mt-4">
-                                        {["Report an FIR", "Emergency Contacts", "Check Status", "Nearest Station"].map((suggestion) => (
+                                {/* FAQ Options (Only in FAQ Mode) */}
+                                {!isAiMode && (
+                                    <div className="grid grid-cols-1 gap-2 mt-4 px-2">
+                                        <div className="flex justify-center mb-2">
+                                            <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
+                                                <button
+                                                    onClick={() => setLanguage('en')}
+                                                    className={`px-3 py-1 text-xs rounded-md transition-all ${language === 'en' ? 'bg-white dark:bg-slate-700 shadow text-primary-600 font-medium' : 'text-slate-500 hover:text-slate-700'}`}
+                                                >
+                                                    English
+                                                </button>
+                                                <button
+                                                    onClick={() => setLanguage('hi')}
+                                                    className={`px-3 py-1 text-xs rounded-md transition-all ${language === 'hi' ? 'bg-white dark:bg-slate-700 shadow text-primary-600 font-medium' : 'text-slate-500 hover:text-slate-700'}`}
+                                                >
+                                                    हिंदी
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <p className="text-xs text-slate-400 mb-1 text-center">
+                                            {language === 'en' ? "Select a question:" : "Ek sawal chunein:"}
+                                        </p>
+
+                                        {(language === 'en' ? [
+                                            "How to file an FIR?",
+                                            "How to check FIR status?",
+                                            "What documents are required for FIR?",
+                                            "How to find Officer details?"
+                                        ] : [
+                                            "FIR kaise kare?",
+                                            "FIR status kaise check kare?",
+                                            "FIR ke liye documents?",
+                                            "Officer ki detail kaise milegi?"
+                                        ]).map((question, idx) => (
                                             <button
-                                                key={suggestion}
-                                                onClick={() => setInputValue(suggestion)}
-                                                className="text-xs text-left p-3 rounded-xl border border-slate-200 hover:border-primary-300 hover:bg-primary-50 dark:border-slate-700 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-300"
+                                                key={idx}
+                                                onClick={() => {
+                                                    setInputValue(question);
+                                                    document.dispatchEvent(new CustomEvent('send-faq', { detail: question }));
+                                                }}
+                                                className="text-sm text-left p-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 hover:border-primary-300 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700 transition-all shadow-sm font-medium text-slate-700"
                                             >
-                                                {suggestion}
+                                                {question}
                                             </button>
                                         ))}
                                     </div>
@@ -160,25 +216,27 @@ const Chatbot = () => {
                                 <div ref={messagesEndRef} />
                             </div>
 
-                            {/* Input Area */}
-                            <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
-                                <form onSubmit={handleSendMessage} className="flex space-x-2">
-                                    <input
-                                        type="text"
-                                        value={inputValue}
-                                        onChange={(e) => setInputValue(e.target.value)}
-                                        placeholder="Type your message..."
-                                        className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500/50 placeholder:text-slate-400 text-sm"
-                                    />
-                                    <button
-                                        type="submit"
-                                        disabled={!inputValue.trim()}
-                                        className="bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 rounded-xl transition-all duration-200 shadow-lg shadow-primary-500/30"
-                                    >
-                                        <Send className="w-5 h-5" />
-                                    </button>
-                                </form>
-                            </div>
+                            {/* Input Area (Only in AI Mode) */}
+                            {isAiMode && (
+                                <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
+                                    <form onSubmit={handleSendMessage} className="flex space-x-2">
+                                        <input
+                                            type="text"
+                                            value={inputValue}
+                                            onChange={(e) => setInputValue(e.target.value)}
+                                            placeholder="Ask AI anything..."
+                                            className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500/50 placeholder:text-slate-400 text-sm"
+                                        />
+                                        <button
+                                            type="submit"
+                                            disabled={!inputValue.trim()}
+                                            className="bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 rounded-xl transition-all duration-200 shadow-lg shadow-primary-500/30"
+                                        >
+                                            <Send className="w-5 h-5" />
+                                        </button>
+                                    </form>
+                                </div>
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>

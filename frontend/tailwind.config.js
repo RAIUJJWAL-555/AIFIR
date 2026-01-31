@@ -8,35 +8,44 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
+          50: '#E6EBF2',
+          100: '#C0CCD9',
+          200: '#94A8BF',
+          300: '#6985A6',
+          400: '#40638C',
+          500: '#1A4373',
+          600: '#13355B',
+          700: '#0B1F3A', // Official Deep Navy
+          800: '#071527',
+          900: '#040B15',
         },
         secondary: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
+          50: '#F2F4F7', // Light Ash Grey
+          100: '#E2E6EA',
+          200: '#C5CED6',
+          300: '#A4B4C1',
+          400: '#849AAD',
+          500: '#1E293B', // Slate replacement
           600: '#475569',
           700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
+          800: '#0B1F3A', // Dark Navy for contrast
+          900: '#0F172A',
         },
-        slate: {
-          850: '#152035'
-        }
+        accent: {
+          DEFAULT: '#C9A227', // Government Gold
+          light: '#E3C151',
+          dark: '#A48218',
+        },
+        success: '#1E7F5C',
+        error: '#8B1E1E',
+        text: '#1C1C1C',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'Roboto', 'system-ui', 'sans-serif'],
+        serif: ['Merriweather', 'serif'], 
+      },
+      backgroundImage: {
+        'gov-pattern': "url('https://www.transparenttextures.com/patterns/cubes.png')", // Subtle pattern placeholder
       }
     },
   },
