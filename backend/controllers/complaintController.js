@@ -30,11 +30,11 @@ const getMyComplaints = asyncHandler(async (req, res) => {
 // @route   POST /api/complaints
 // @access  Private
 const createComplaint = asyncHandler(async (req, res) => {
-  const { title, description, incidentType, location, incidentDate, incidentTime, aiDraft, evidence } = req.body;
+  const { title, description, incidentType, location, incidentDate, incidentTime, aiDraft, evidence, latitude, longitude, complainantName, aadharNumber } = req.body;
 
-  if (!title || !description || !incidentType || !location || !incidentDate || !incidentTime) {
+  if (!title || !description || !incidentType || !location || !incidentDate || !incidentTime || !complainantName || !aadharNumber) {
     res.status(400);
-    throw new Error('Please fill in all required fields');
+    throw new Error('Please fill in all required fields including Name and Aadhar Number');
   }
 
   // AI Classification
@@ -66,10 +66,14 @@ const createComplaint = asyncHandler(async (req, res) => {
     description,
     incidentType,
     location,
+    latitude,
+    longitude,
     incidentDate,
     incidentTime,
     aiDraft, // Optional, can be added if generated
     evidence,
+    complainantName,
+    aadharNumber,
     
     // AI Fields
     crimeType: aiAnalysis.crimeType,

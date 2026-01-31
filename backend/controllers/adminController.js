@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler');
 const Complaint = require('../models/Complaint');
 const Admin = require('../models/Admin');
+const Citizen = require('../models/Citizen');
 
 // @desc    Get Admin Dashboard Stats
 // @route   GET /api/admin/stats
@@ -115,8 +116,56 @@ const registerOfficer = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Verify Citizen Identity
+// @route   PATCH /api/admin/verify-identity/:userId
+// @access  Private (Admin/Police)
+const verifyIdentity = asyncHandler(async (req, res) => {
+  const { status, remark } = req.body;
+  const { userId } = req.params;
+
+  if (req.user.role === 'citizen') {
+    res.status(403);
+    throw new Error('Not authorized');
+  }
+
+  const user = await Citizen.findById(userId);
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  user.identityStatus = status;
+  user.identityRemark = remark || '';
+
+  await user.save();
+
+  res.status(200).json({
+    success: true,
+    data: {
+      identityStatus: user.identityStatus,
+      identityRemark: user.identityRemark
+    }
+  });
+});
+
+// @desc    Get All Pending Identity Verifications
+// @route   GET /api/admin/pending-identities
+// @access  Private (Admin/Police)
+const getPendingVerifications = asyncHandler(async (req, res) => {
+  if (req.user.role === 'citizen') {
+    res.status(403);
+    throw new Error('Not authorized');
+  }
+
+  const pendingUsers = await Citizen.find({ identityStatus: 'Pending' }).select('-password');
+  res.status(200).json(pendingUsers);
+});
+
 module.exports = {
   getDashboardStats,
   getAllOfficers,
-  registerOfficer
+  registerOfficer,
+  verifyIdentity,
+  getPendingVerifications
 };

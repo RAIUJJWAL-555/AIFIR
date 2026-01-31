@@ -11,7 +11,9 @@ import {
     UserCheck,
     FileBadge,
     UserPlus,
-    BarChart2
+    BarChart2,
+    MapPin,
+    User
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -21,8 +23,10 @@ const Sidebar = () => {
     // Citizen Links
     const userLinks = [
         { name: 'Dashboard', path: '/user/dashboard', icon: LayoutDashboard },
+        { name: 'My Profile', path: '/user/profile', icon: User },
         { name: 'Register Complaint', path: '/user/register', icon: PlusCircle },
         { name: 'My Complaints', path: '/user/status', icon: History },
+        { name: 'Nearby Police Stations', path: '/user/nearby-stations', icon: MapPin },
     ];
 
     // Admin (Assigner) Links
@@ -30,6 +34,7 @@ const Sidebar = () => {
         { name: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
         { name: 'Review Complaints', path: '/admin/review', icon: FileText },
         { name: 'Officer Assignment', path: '/admin/assign', icon: UserCheck },
+        { name: 'Verify Identities', path: '/admin/users/verify', icon: ShieldCheck },
         { name: 'FIR Management', path: '/admin/firs', icon: FileBadge },
         { name: 'Analytics', path: '/admin/analytics', icon: BarChart2 },
         { name: 'Register Officer', path: '/admin/officers/register', icon: UserPlus },

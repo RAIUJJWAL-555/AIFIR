@@ -28,6 +28,7 @@ app.use('/api/complaints', require('./routes/complaintRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/analytics', require('./routes/analyticsRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
+app.use('/api/stations', require('./routes/stationRoutes'));
 app.use("/api/chat", chatRoutes);
 app.use('/api/ai', require('./routes/aiRoutes'));
 

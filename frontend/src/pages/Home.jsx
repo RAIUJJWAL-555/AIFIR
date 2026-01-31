@@ -14,9 +14,14 @@ import {
     AlertTriangle,
     FileCheck,
     UserCheck,
-    Megaphone
+    Megaphone,
+    MapPin,
+    X,
+    Loader
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import axios from 'axios';
 
 const ServiceCard = ({ icon: Icon, title, description, color = "text-primary-600", bg = "bg-primary-50" }) => (
     <motion.div
@@ -39,13 +44,55 @@ const ServiceCard = ({ icon: Icon, title, description, color = "text-primary-600
 
 const Home = () => {
     const navigate = useNavigate();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [stationResults, setStationResults] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [showResults, setShowResults] = useState(false);
+
+    const handleSearch = async () => {
+        if (!searchQuery.trim()) return;
+
+        setLoading(true);
+        setStationResults([]);
+        setShowResults(true);
+
+        try {
+            // 1. Geocode the location (using simple public API for demo)
+            const geoRes = await axios.get('https://nominatim.openstreetmap.org/search', {
+                params: {
+                    q: searchQuery,
+                    format: 'json',
+                    limit: 1
+                }
+            });
+
+            if (geoRes.data && geoRes.data.length > 0) {
+                const { lat, lon } = geoRes.data[0];
+
+                // 2. Fetch nearby stations from our backend
+                const stationsRes = await axios.post('http://localhost:5000/api/stations/nearby', {
+                    lat: parseFloat(lat),
+                    lon: parseFloat(lon),
+                    radius: 20000 // 20km radius (Efficient for Delhi NCR coverage)
+                });
+
+                setStationResults(stationsRes.data);
+            } else {
+                setStationResults([]); // Location not found
+            }
+        } catch (error) {
+            console.error("Search failed", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-navy-50 font-sans text-navy-900 selection:bg-primary-200">
             <PublicNavbar />
 
             {/* HERO SECTION - Modern Glassmorphism */}
-            <section id="home" className="relative pt-32 pb-32 overflow-hidden bg-navy-900">
+            <section id="home" className="relative pt-32 pb-32 bg-navy-900">
                 {/* Abstract Background Shapes */}
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
                     <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-600/20 rounded-full blur-3xl animate-pulse"></div>
@@ -94,20 +141,78 @@ const Home = () => {
 
                 {/* Glass Search Bar Overlay */}
                 <div className="absolute -bottom-8 left-0 w-full z-20 px-4">
-                    <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-4 items-center">
-                        <div className="flex-1 w-full relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 h-5 w-5" />
-                            <input
-                                type="text"
-                                placeholder="Search for services, nearby stations, or officials..."
-                                className="w-full bg-navy-900/50 border border-navy-700 text-white placeholder-navy-300 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
-                            />
+                    <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-2xl flex flex-col items-center relative">
+                        <div className="flex flex-col md:flex-row gap-4 items-center w-full">
+                            <div className="flex-1 w-full relative">
+                                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 h-5 w-5" />
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    placeholder="Enter location to find nearby stations..."
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                    className="w-full bg-navy-900/50 border border-navy-700 text-white placeholder-navy-300 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+                                />
+                            </div>
+                            <div className="flex gap-2 w-full md:w-auto">
+                                <button
+                                    onClick={handleSearch}
+                                    disabled={loading}
+                                    className="flex-1 md:flex-none px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium transition-colors flex items-center justify-center min-w-[100px]"
+                                >
+                                    {loading ? <Loader className="h-5 w-5 animate-spin" /> : "Search"}
+                                </button>
+                            </div>
                         </div>
-                        <div className="flex gap-2 w-full md:w-auto">
-                            <button className="flex-1 md:flex-none px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium transition-colors">
-                                Search
-                            </button>
-                        </div>
+
+                        {/* Search Results Dropdown */}
+                        <AnimatePresence>
+                            {showResults && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 10 }}
+                                    className="absolute top-full left-0 w-full mt-2 bg-white rounded-xl shadow-2xl border border-navy-100 overflow-hidden z-50 max-h-80 overflow-y-auto"
+                                >
+                                    <div className="flex justify-between items-center p-3 border-b border-gray-100 bg-gray-50 sticky top-0">
+                                        <h3 className="text-sm font-bold text-navy-800">
+                                            {loading ? 'Searching...' : `Results near "${searchQuery}"`}
+                                        </h3>
+                                        <button onClick={() => setShowResults(false)} className="text-gray-500 hover:text-red-500">
+                                            <X className="h-4 w-4" />
+                                        </button>
+                                    </div>
+
+                                    <div className="p-2">
+                                        {!loading && stationResults.length === 0 && (
+                                            <div className="p-4 text-center text-gray-500 text-sm">
+                                                No police stations found nearby or invalid location.
+                                            </div>
+                                        )}
+
+                                        {stationResults.map((station, idx) => (
+                                            <div key={idx} className="flex items-start gap-3 p-3 hover:bg-blue-50 rounded-lg transition-colors border-b last:border-0 border-gray-50">
+                                                <div className="bg-blue-100 text-blue-600 p-2 rounded-lg shrink-0">
+                                                    <Shield className="h-4 w-4" />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-semibold text-navy-900 text-sm truncate">{station.tags?.name || 'Police Station'}</h4>
+                                                    <p className="text-xs text-navy-500 truncate">{station.tags?.['addr:city'] || 'Local Station'}</p>
+                                                </div>
+                                                <a
+                                                    href={`https://www.google.com/maps/search/?api=1&query=${station.lat},${station.lon}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg text-xs font-medium whitespace-nowrap flex items-center gap-1"
+                                                >
+                                                    <MapPin className="h-3 w-3" /> Map
+                                                </a>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 </div>
             </section>

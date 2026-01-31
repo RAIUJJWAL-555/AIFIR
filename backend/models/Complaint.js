@@ -20,6 +20,14 @@ const complaintSchema = mongoose.Schema({
     type: String,
     required: [true, 'Please add a description']
   },
+  complainantName: {
+    type: String,
+    required: true
+  },
+  aadharNumber: {
+    type: String,
+    required: true
+  },
   incidentType: {
     type: String,
     required: true,
@@ -28,6 +36,14 @@ const complaintSchema = mongoose.Schema({
   location: {
     type: String,
     required: true
+  },
+  latitude: {
+    type: Number,
+    required: false
+  },
+  longitude: {
+    type: Number,
+    required: false
   },
   incidentDate: {
     type: Date,

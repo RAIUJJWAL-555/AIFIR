@@ -18,11 +18,18 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         // Check for existing token in sessionStorage
         const token = sessionStorage.getItem('token');
-        const role = sessionStorage.getItem('role');
-        const name = sessionStorage.getItem('name');
+        const userStr = sessionStorage.getItem('user');
 
-        if (token && role) {
-            setUser({ token, role, name });
+        if (token && userStr) {
+            try {
+                const userData = JSON.parse(userStr);
+                setUser(userData);
+            } catch (e) {
+                // Fallback if JSON parse fails
+                const role = sessionStorage.getItem('role');
+                const name = sessionStorage.getItem('name');
+                if (role) setUser({ token, role, name });
+            }
         }
         setLoading(false);
     }, []);
@@ -53,7 +60,8 @@ export const AuthProvider = ({ children }) => {
                 role: data.role,
                 name: data.name,
                 email: data.email,
-                id: data._id
+                id: data._id,
+                identityStatus: data.identityStatus
             };
 
             sessionStorage.setItem('token', userData.token);

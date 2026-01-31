@@ -11,6 +11,25 @@ const citizenSchema = mongoose.Schema({
     required: [true, 'Please add an email'],
     unique: true
   },
+  dob: {
+    type: Date,
+    required: [true, 'Please add Date of Birth']
+  },
+  identityStatus: {
+    type: String,
+    enum: ['Pending', 'Verified', 'Rejected'],
+    default: 'Pending'
+  },
+  identityRemark: {
+    type: String,
+    default: ''
+  },
+  ocrResult: {
+    hasAadhaarWord: Boolean,
+    has12DigitNumber: Boolean,
+    hasDOB: Boolean,
+    rawText: String
+  },
   password: {
     type: String,
     required: [true, 'Please add a password']
@@ -22,6 +41,15 @@ const citizenSchema = mongoose.Schema({
   address: {
     type: String,
     required: false
+  },
+  aadharNumber: {
+    type: String,
+    required: [true, 'Please add Aadhar Number'],
+    unique: true
+  },
+  aadharCardPath: {
+    type: String,
+    required: false // Optional for now to avoid breaking existing users/admins
   },
   role: {
     type: String,

@@ -19,7 +19,7 @@ const Login = () => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const loggedInUser = await login(role, identifier, password);
+            const loggedInUser = await login(role, identifier.trim(), password.trim());
             toast.success('Successfully logged in!');
             // Navigate based on returned role
             if (loggedInUser.role === 'citizen') {

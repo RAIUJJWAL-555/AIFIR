@@ -8,6 +8,7 @@ import UserDashboard from './pages/user/UserDashboard';
 import RegisterComplaint from './pages/user/RegisterComplaint';
 import ComplaintStatus from './pages/user/ComplaintStatus';
 import ComplaintDetails from './pages/user/ComplaintDetails';
+import NearbyStations from './pages/user/NearbyStations';
 import PoliceDashboard from './pages/police/PoliceDashboard';
 import ReviewComplaints from './pages/police/ReviewComplaints';
 import FIRManagement from './pages/police/FIRManagement';
@@ -16,6 +17,8 @@ import OfficerDashboard from './pages/police/OfficerDashboard';
 import CaseDetails from './pages/police/CaseDetails';
 import RegisterOfficer from './pages/police/RegisterOfficer';
 import AnalyticsDashboard from './pages/admin/AnalyticsDashboard';
+import IdentityVerification from './pages/admin/IdentityVerification';
+import UserProfile from './pages/user/UserProfile';
 
 import Home from './pages/Home';
 
@@ -64,9 +67,11 @@ function App() {
               </ProtectedRoute>
             }>
               <Route path="dashboard" element={<UserDashboard />} />
+              <Route path="profile" element={<UserProfile />} />
               <Route path="register" element={<RegisterComplaint />} />
               <Route path="status" element={<ComplaintStatus />} />
               <Route path="complaint/:id" element={<ComplaintDetails />} />
+              <Route path="nearby-stations" element={<NearbyStations />} />
             </Route>
 
             {/* Admin Routes (Assigners) */}
@@ -75,14 +80,14 @@ function App() {
                 <DashboardLayout />
               </ProtectedRoute>
             }>
-              import AnalyticsDashboard from './pages/admin/AnalyticsDashboard';
 
-              // ... (in Admin Routes)
+              {/* ... (in Admin Routes) */}
               <Route path="dashboard" element={<PoliceDashboard />} /> {/* Reusing PoliceDashboard for Admin for now */}
               <Route path="analytics" element={<AnalyticsDashboard />} />
               <Route path="assign" element={<OfficerAssignment />} />
               <Route path="review" element={<ReviewComplaints />} />
               <Route path="officers/register" element={<RegisterOfficer />} />
+              <Route path="users/verify" element={<IdentityVerification />} />
               <Route path="case/:id" element={<CaseDetails />} />
               <Route path="firs" element={<FIRManagement />} />
             </Route>

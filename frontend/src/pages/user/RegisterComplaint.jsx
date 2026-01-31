@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -9,18 +10,30 @@ import { Sparkles, MapPin, Upload, ArrowLeft } from 'lucide-react';
 
 const RegisterComplaint = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [formData, setFormData] = useState({
         type: '',
         date: '',
         time: '',
         location: '',
         description: '',
+        complainantName: user?.name || '',
+        aadharNumber: '',
     });
+
+    // Update name if user loads late
+    useState(() => {
+        if (user?.name) {
+            setFormData(prev => ({ ...prev, complainantName: user.name }));
+        }
+    }, [user]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [generatedDraft, setGeneratedDraft] = useState('');
     const [uploading, setUploading] = useState(false);
     const [evidence, setEvidence] = useState('');
     const [isClassifying, setIsClassifying] = useState(false);
+    const [coordinates, setCoordinates] = useState({ lat: null, lng: null });
+    const [locationLoading, setLocationLoading] = useState(false);
 
     const handleAutoClassify = async () => {
         if (!formData.description) return;
@@ -101,9 +114,43 @@ const RegisterComplaint = () => {
         }
     };
 
+    const handleGetLocation = () => {
+        if (!navigator.geolocation) {
+            toast.error("Geolocation is not supported by your browser");
+            return;
+        }
+
+        setLocationLoading(true);
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                setCoordinates({ lat: latitude, lng: longitude });
+                setFormData(prev => ({
+                    ...prev,
+                    location: `Lat: ${latitude.toFixed(6)}, Lon: ${longitude.toFixed(6)}` // Auto-fill text as well
+                }));
+                setLocationLoading(false);
+                toast.success("Location coordinates captured!");
+            },
+            (error) => {
+                console.error("Error getting location:", error);
+                toast.error("Unable to retrieve your location. Please ensure location access is enabled.");
+                setLocationLoading(false);
+            }
+        );
+    };
+
     const handleAIAssist = async (typeOverride = null) => {
         const currentType = typeOverride || formData.type;
         if (!formData.description) return;
+
+        // Ensure coordinates are captured for draft
+        if (!coordinates.lat || !coordinates.lng) {
+            toast.info("Please capture your location coordinates first for the FIR draft.");
+            // Optional: Auto trigger capture?
+            // handleGetLocation(); 
+            return;
+        }
 
         setIsGenerating(true);
         // Simulate AI Call (or we could use the AI endpoint here too if we wanted a better draft)
@@ -125,18 +172,23 @@ I am writing to formally report an incident of ${currentType || '...'} that occu
 Details of the incident:
 ${formData.description}
 
-The incident took place at ${formData.location || '[Location]'}.
+The incident took place at ${formData.location || '[Location]'} (GPS: ${coordinates.lat?.toFixed(6)}, ${coordinates.lng?.toFixed(6)}).
 
 I request you to kindly register an FIR and take necessary legal action.
 
 Sincerely,
-[Complainant Name]`);
+${user?.name || '[Complainant Name]'}`);
 
         setIsGenerating(false);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (user?.role === 'citizen' && user?.identityStatus !== 'Verified') {
+            toast.error("Your identity is not verified yet. FIR submission requires verified identity.");
+            return;
+        }
 
         try {
             const token = sessionStorage.getItem('token');
@@ -154,7 +206,11 @@ Sincerely,
                 incidentTime: formData.time,
                 location: formData.location,
                 aiDraft: generatedDraft,
-                evidence: evidence
+                evidence: evidence,
+                latitude: coordinates.lat,
+                longitude: coordinates.lng,
+                complainantName: formData.complainantName,
+                aadharNumber: formData.aadharNumber
             }, config);
 
             toast.success('Complaint Submitted Successfully!');
@@ -222,6 +278,25 @@ Sincerely,
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <Input
+                                        label="Complainant Name"
+                                        placeholder="Full Name"
+                                        value={formData.complainantName}
+                                        onChange={(e) => setFormData({ ...formData, complainantName: e.target.value })}
+                                        required
+                                    />
+                                    <Input
+                                        label="Aadhar Number"
+                                        placeholder="12-digit Aadhar Number"
+                                        value={formData.aadharNumber}
+                                        onChange={(e) => setFormData({ ...formData, aadharNumber: e.target.value })}
+                                        required
+                                        maxLength={12}
+                                        minLength={12}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-1.5">
                                             Incident Type
@@ -260,13 +335,39 @@ Sincerely,
                                         onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                                         required
                                     />
-                                    <Input
-                                        label="Location Checkpoint"
-                                        placeholder="e.g. Near City Mall"
-                                        value={formData.location}
-                                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                        required
-                                    />
+                                    <div className="md:col-span-1">
+                                        <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                                            Location & GPS <span className="text-red-500">*</span>
+                                        </label>
+                                        <div className="space-y-2">
+                                            <input
+                                                type="text"
+                                                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                                placeholder="e.g. Near City Mall"
+                                                value={formData.location}
+                                                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                                                required
+                                            />
+                                            <div className="flex gap-2">
+                                                <div className={`flex-1 flex items-center px-3 py-2 border rounded-lg bg-slate-50 text-slate-600 text-xs ${!coordinates.lat ? 'border-red-300' : 'border-slate-300'}`}>
+                                                    <MapPin className="h-3 w-3 mr-2 text-slate-400" />
+                                                    {coordinates.lat
+                                                        ? `${coordinates.lat.toFixed(6)}, ${coordinates.lng.toFixed(6)}`
+                                                        : "GPS Required *"}
+                                                </div>
+                                                <Button
+                                                    type="button"
+                                                    size="sm"
+                                                    onClick={handleGetLocation}
+                                                    isLoading={locationLoading}
+                                                    variant={coordinates.lat ? "success" : "secondary"}
+                                                    className="py-1 h-9 text-xs"
+                                                >
+                                                    {coordinates.lat ? "Update GPS" : "Get GPS"}
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {generatedDraft && (
@@ -325,18 +426,7 @@ Sincerely,
                         </CardContent>
                     </Card>
 
-                    <Card>
-                        <CardHeader><CardTitle>Location Map</CardTitle></CardHeader>
-                        <CardContent>
-                            <div className="bg-slate-200 h-48 rounded-lg flex items-center justify-center text-slate-500 relative overflow-hidden group">
-                                <MapPin className="h-8 w-8 text-slate-400" />
-                                <span className="ml-2 text-sm font-medium">Map Placeholder</span>
-                                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                    <Button variant="secondary" size="sm">Set on Map</Button>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
+
                 </div>
             </div>
         </div>
