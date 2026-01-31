@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Minus, Bot, User, Sparkles } from 'lucide-react';
+import { MessageCircle, X, Send, Minus, Bot, User, Sparkles, Languages } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Chatbot = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
-        { id: 1, text: "Hello! I'm your AI Assistant. How can I help you today?", sender: 'bot', time: new Date().toLocaleTimeString() }
+        { id: 1, text: "Jai Hind! I help you file complaints and answer queries. How can I assist you?", sender: 'bot', time: new Date().toLocaleTimeString() }
     ]);
     const [inputValue, setInputValue] = useState('');
     const [isAiMode, setIsAiMode] = useState(true); // Default to AI mode
@@ -67,7 +67,7 @@ const Chatbot = () => {
             console.error("Chat Error:", error);
             setMessages(prev => [...prev, {
                 id: messages.length + 2,
-                text: "Sorry, I'm having trouble connecting to the server.",
+                text: "Network connection issue. Please try again.",
                 sender: 'bot',
                 time: new Date().toLocaleTimeString()
             }]);
@@ -81,56 +81,74 @@ const Chatbot = () => {
 
     return (
         <>
-            <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-4">
+            <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end space-y-4 font-sans">
                 <AnimatePresence>
                     {isOpen && (
                         <motion.div
-                            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                            initial={{ opacity: 0, y: 20, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                            exit={{ opacity: 0, y: 20, scale: 0.95 }}
                             transition={{ duration: 0.2 }}
-                            className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-slate-200 dark:border-slate-700 shadow-2xl rounded-2xl w-[380px] h-[600px] flex flex-col overflow-hidden"
+                            className="bg-navy-900/95 backdrop-blur-xl border border-white/10 shadow-2xl rounded-2xl w-[380px] h-[600px] flex flex-col overflow-hidden ring-1 ring-white/5"
                         >
                             {/* Header */}
-                            <div className="bg-gradient-to-r from-primary-600 to-primary-500 p-4 flex items-center justify-between shrink-0">
+                            <div className="bg-gradient-to-r from-navy-950 to-navy-900 p-4 flex items-center justify-between shrink-0 border-b border-white/5">
                                 <div className="flex items-center space-x-3 text-white">
-                                    <div className="bg-white/20 p-2 rounded-lg backdrop-blur-sm">
-                                        <Bot className="w-6 h-6" />
+                                    <div className="bg-gradient-to-br from-primary-600 to-primary-800 p-2 rounded-xl shadow-lg shadow-primary-900/50">
+                                        <Bot className="w-6 h-6 text-white" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg leading-none">
-                                            {isAiMode ? "Smart AI Assitant" : "Help Center"}
+                                        <h3 className="font-bold text-lg leading-tight tracking-tight">
+                                            {isAiMode ? "Police AI Assistant" : "Help Center"}
                                         </h3>
-                                        <div className="flex items-center space-x-1 mt-1">
-                                            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                                            <span className="text-xs text-blue-100 font-medium">Online</span>
+                                        <div className="flex items-center space-x-1.5 mt-0.5">
+                                            <span className="w-1.5 h-1.5 bg-accent rounded-full animate-pulse shadow-[0_0_8px_rgba(251,191,36,0.8)]"></span>
+                                            <span className="text-[10px] text-accent font-medium tracking-wide uppercase">Online</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center space-x-2 text-white/80">
-                                    {/* Mode Toggle */}
+                                <div className="flex items-center space-x-1 text-white/80">
                                     <button
-                                        onClick={() => setIsAiMode(!isAiMode)}
-                                        className="text-xs bg-white/20 hover:bg-white/30 px-2 py-1 rounded transition-colors border border-white/10"
-                                        title={isAiMode ? "Switch to FAQ Mode" : "Switch to Smart AI"}
-                                    >
-                                        {isAiMode ? "Switch to FAQ" : "Switch to AI"}
-                                    </button>
-                                    <button
-                                        onClick={() => setIsOpen(false)}
-                                        className="p-1.5 hover:bg-white/10 rounded-lg transition-colors"
+                                        onClick={() => setIsOpne(false)}
+                                        className="p-2 hover:bg-white/5 rounded-lg transition-colors text-white/60 hover:text-white"
                                     >
                                         <Minus className="w-5 h-5" />
                                     </button>
                                 </div>
                             </div>
 
+                            {/* Mode Switcher with Glassmorphism */}
+                            <div className="px-4 pt-4 pb-2 bg-navy-900/50">
+                                <div className="bg-navy-950/80 p-1 rounded-xl flex border border-white/5">
+                                    <button
+                                        onClick={() => setIsAiMode(true)}
+                                        className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-all duration-300 ${isAiMode
+                                                ? 'bg-primary-600 text-white shadow-lg'
+                                                : 'text-navy-300 hover:text-white hover:bg-white/5'
+                                            }`}
+                                    >
+                                        <Sparkles className="w-3 h-3" />
+                                        Smart AI
+                                    </button>
+                                    <button
+                                        onClick={() => setIsAiMode(false)}
+                                        className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-semibold transition-all duration-300 ${!isAiMode
+                                                ? 'bg-navy-700 text-white shadow-lg'
+                                                : 'text-navy-300 hover:text-white hover:bg-white/5'
+                                            }`}
+                                    >
+                                        <MessageCircle className="w-3 h-3" />
+                                        FAQ Mode
+                                    </button>
+                                </div>
+                            </div>
+
                             {/* Messages Area */}
-                            <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
-                                <div className="flex justify-center my-4">
-                                    <div className="bg-slate-100 dark:bg-slate-800 text-slate-500 text-xs py-1 px-3 rounded-full">
-                                        Today • {isAiMode ? "AI Mode" : "FAQ Mode"}
-                                    </div>
+                            <div className="flex-1 overflow-y-auto p-4 space-y-5 custom-scrollbar bg-navy-900">
+                                <div className="flex justify-center mb-2">
+                                    <span className="px-3 py-1 bg-white/5 rounded-full text-[10px] font-medium text-navy-300 border border-white/5">
+                                        {new Date().toLocaleDateString()}
+                                    </span>
                                 </div>
 
                                 {messages.map((msg) => (
@@ -140,22 +158,22 @@ const Chatbot = () => {
                                         animate={{ opacity: 1, y: 0 }}
                                         className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                                     >
-                                        <div className={`flex max-w-[80%] ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'} items-end gap-2`}>
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${msg.sender === 'user'
-                                                ? 'bg-primary-100 text-primary-600'
-                                                : 'bg-primary-600 text-white'
+                                        <div className={`flex max-w-[85%] ${msg.sender === 'user' ? 'flex-row-reverse' : 'flex-row'} items-end gap-2.5`}>
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-md ${msg.sender === 'user'
+                                                ? 'bg-navy-700 border border-navy-600 text-white'
+                                                : 'bg-gradient-to-br from-primary-600 to-primary-700 text-white border border-primary-500'
                                                 }`}>
-                                                {msg.sender === 'user' ? <User size={16} /> : <Sparkles size={16} />}
+                                                {msg.sender === 'user' ? <User size={14} /> : <Bot size={14} />}
                                             </div>
 
                                             <div
-                                                className={`p-3 rounded-2xl ${msg.sender === 'user'
-                                                    ? 'bg-primary-600 text-white rounded-tr-sm'
-                                                    : 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 rounded-tl-sm'
+                                                className={`p-3.5 shadow-sm relative ${msg.sender === 'user'
+                                                    ? 'bg-white text-navy-900 rounded-2xl rounded-tr-none'
+                                                    : 'bg-navy-800 text-white border border-white/5 rounded-2xl rounded-tl-none'
                                                     }`}
                                             >
-                                                <p className="text-sm leading-relaxed">{msg.text}</p>
-                                                <span className={`text-[10px] mt-1 block ${msg.sender === 'user' ? 'text-primary-200' : 'text-slate-400'
+                                                <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                                                <span className={`text-[10px] mt-1.5 block font-medium ${msg.sender === 'user' ? 'text-navy-400' : 'text-navy-400'
                                                     }`}>
                                                     {msg.time.replace(/:\d\d /, ' ')}
                                                 </span>
@@ -166,27 +184,17 @@ const Chatbot = () => {
 
                                 {/* FAQ Options (Only in FAQ Mode) */}
                                 {!isAiMode && (
-                                    <div className="grid grid-cols-1 gap-2 mt-4 px-2">
-                                        <div className="flex justify-center mb-2">
-                                            <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
-                                                <button
-                                                    onClick={() => setLanguage('en')}
-                                                    className={`px-3 py-1 text-xs rounded-md transition-all ${language === 'en' ? 'bg-white dark:bg-slate-700 shadow text-primary-600 font-medium' : 'text-slate-500 hover:text-slate-700'}`}
-                                                >
-                                                    English
-                                                </button>
-                                                <button
-                                                    onClick={() => setLanguage('hi')}
-                                                    className={`px-3 py-1 text-xs rounded-md transition-all ${language === 'hi' ? 'bg-white dark:bg-slate-700 shadow text-primary-600 font-medium' : 'text-slate-500 hover:text-slate-700'}`}
-                                                >
-                                                    हिंदी
-                                                </button>
-                                            </div>
+                                    <div className="grid grid-cols-1 gap-2 mt-4 px-1">
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-xs text-navy-300 font-medium">Suggested Questions</span>
+                                            <button
+                                                onClick={() => setLanguage(l => l === 'en' ? 'hi' : 'en')}
+                                                className="flex items-center gap-1.5 px-2 py-1 bg-white/5 hover:bg-white/10 rounded text-xs text-accent transition-colors"
+                                            >
+                                                <Languages className="w-3 h-3" />
+                                                {language === 'en' ? 'हिन्दी' : 'English'}
+                                            </button>
                                         </div>
-
-                                        <p className="text-xs text-slate-400 mb-1 text-center">
-                                            {language === 'en' ? "Select a question:" : "Ek sawal chunein:"}
-                                        </p>
 
                                         {(language === 'en' ? [
                                             "How to file an FIR?",
@@ -194,10 +202,10 @@ const Chatbot = () => {
                                             "What documents are required for FIR?",
                                             "How to find Officer details?"
                                         ] : [
-                                            "FIR kaise kare?",
-                                            "FIR status kaise check kare?",
+                                            "FIR kaise file karein?",
+                                            "FIR status kaise check karein?",
                                             "FIR ke liye documents?",
-                                            "Officer ki detail kaise milegi?"
+                                            "Investigating Officer kaise dhundhe?"
                                         ]).map((question, idx) => (
                                             <button
                                                 key={idx}
@@ -205,7 +213,7 @@ const Chatbot = () => {
                                                     setInputValue(question);
                                                     document.dispatchEvent(new CustomEvent('send-faq', { detail: question }));
                                                 }}
-                                                className="text-sm text-left p-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 hover:border-primary-300 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-700 transition-all shadow-sm font-medium text-slate-700"
+                                                className="text-sm text-left px-4 py-3 rounded-xl bg-navy-800/50 border border-white/5 text-navy-100 hover:bg-navy-700/50 hover:border-primary-500/30 hover:shadow-lg transition-all duration-200"
                                             >
                                                 {question}
                                             </button>
@@ -218,19 +226,19 @@ const Chatbot = () => {
 
                             {/* Input Area (Only in AI Mode) */}
                             {isAiMode && (
-                                <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700">
-                                    <form onSubmit={handleSendMessage} className="flex space-x-2">
+                                <div className="p-4 bg-navy-950 border-t border-white/5">
+                                    <form onSubmit={handleSendMessage} className="flex gap-2">
                                         <input
                                             type="text"
                                             value={inputValue}
                                             onChange={(e) => setInputValue(e.target.value)}
-                                            placeholder="Ask AI anything..."
-                                            className="flex-1 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500/50 placeholder:text-slate-400 text-sm"
+                                            placeholder="Type your message here..."
+                                            className="flex-1 bg-navy-900 text-white rounded-xl px-4 py-3.5 focus:outline-none focus:ring-1 focus:ring-primary-500 border border-white/5 placeholder:text-navy-500 text-sm shadow-inner"
                                         />
                                         <button
                                             type="submit"
                                             disabled={!inputValue.trim()}
-                                            className="bg-primary-600 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 rounded-xl transition-all duration-200 shadow-lg shadow-primary-500/30"
+                                            className="bg-primary-600 hover:bg-primary-500 disabled:opacity-50 disabled:cursor-not-allowed text-white p-3.5 rounded-xl transition-all duration-200 shadow-lg shadow-primary-900/20 active:scale-95 flex items-center justify-center"
                                         >
                                             <Send className="w-5 h-5" />
                                         </button>
@@ -245,20 +253,13 @@ const Chatbot = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={toggleChat}
-                    className="bg-primary-600 hover:bg-primary-700 text-white p-4 rounded-full shadow-lg shadow-primary-500/30 transition-all duration-300 group relative"
+                    className="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-500 hover:to-primary-600 text-white p-4.5 rounded-full shadow-2xl shadow-primary-900/40 transition-all duration-300 group relative border border-white/10"
                 >
-                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+                    <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-green-500 rounded-full border-[3px] border-navy-900"></span>
                     {isOpen ? (
-                        <X className="w-6 h-6" />
+                        <X className="w-7 h-7" />
                     ) : (
-                        <MessageCircle className="w-6 h-6" />
-                    )}
-
-                    {/* Tooltip for button */}
-                    {!isOpen && (
-                        <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-slate-900 text-white text-xs rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                            Chat with us
-                        </div>
+                        <Bot className="w-7 h-7" />
                     )}
                 </motion.button>
             </div>

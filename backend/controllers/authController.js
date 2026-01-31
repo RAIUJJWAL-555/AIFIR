@@ -66,17 +66,35 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, badgeId, password } = req.body;
 
+  console.log('Login Attempt:', { email, badgeId, hasPassword: !!password });
+
   let user;
 
   if (badgeId) {
-    // Login with Badge ID (Police)
+    // Login with Badge ID (Police) - Only check Admin collection
     user = await Admin.findOne({ badgeId });
+    console.log('Searching by BadgeID:', badgeId, 'Found:', user ? user.role : 'No user');
   } else if (email) {
-    // Login with Email (Admin or Citizen)
-    user = await Admin.findOne({ email }) || await Citizen.findOne({ email });
+    // Login with Email - Check Admin first, then Citizen
+    user = await Admin.findOne({ email });
+    console.log('Searching Admin by Email:', email, 'Found:', user ? user.role : 'No user');
+    
+    if (!user) {
+        user = await Citizen.findOne({ email });
+        console.log('Searching Citizen by Email:', email, 'Found:', user ? user.role : 'No user');
+    }
   }
 
-  if (user && (await user.matchPassword(password))) {
+  if (!user) {
+      console.log('Login failed: User not found');
+      return res.status(400).json({ message: 'User not found' });
+  }
+
+  const isMatch = await user.matchPassword(password);
+  console.log('Password Match Result:', isMatch);
+
+  if (user && isMatch) {
+    console.log('Login Successful for:', user.email);
     res.json({
       _id: user.id,
       name: user.name,
@@ -86,6 +104,7 @@ const loginUser = async (req, res) => {
       token: generateToken(user.id),
     });
   } else {
+    console.log('Login failed: Invalid password');
     res.status(400).json({ message: 'Invalid credentials' });
   }
 };

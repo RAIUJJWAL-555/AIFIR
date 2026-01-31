@@ -9,7 +9,7 @@ const PublicNavbar = () => {
 
     useEffect(() => {
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 10);
+            setIsScrolled(window.scrollY > 20);
         };
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
@@ -17,21 +17,25 @@ const PublicNavbar = () => {
 
     const navLinks = [
         { name: 'Home', href: '#home' },
-        { name: 'Features', href: '#features' },
-        { name: 'How It Works', href: '#how-it-works' },
-        { name: 'About', href: '#about' },
+        { name: 'Services', href: '#services' },
+        { name: 'Tech', href: '#about' }, // Renamed for modern feel
+        { name: 'Contact', href: '#' },
     ];
 
     return (
         <nav
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
+                    ? 'bg-navy-900/90 backdrop-blur-md shadow-lg border-b border-white/10 py-3'
+                    : 'bg-transparent py-6'
                 }`}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <ShieldCheck className="h-8 w-8 text-primary-600" />
-                        <span className={`text-xl font-bold tracking-tight ${isScrolled ? 'text-slate-900' : 'text-slate-900'}`}>
+                    <div className="flex items-center gap-3">
+                        <div className={`p-1.5 rounded-lg ${isScrolled ? 'bg-primary-600/20' : 'bg-white/10'}`}>
+                            <ShieldCheck className={`h-7 w-7 ${isScrolled ? 'text-primary-400' : 'text-white'}`} />
+                        </div>
+                        <span className={`text-xl font-bold tracking-tight ${isScrolled ? 'text-white' : 'text-white'}`}>
                             AI-FiR Sys
                         </span>
                     </div>
@@ -42,7 +46,10 @@ const PublicNavbar = () => {
                             <a
                                 key={link.name}
                                 href={link.href}
-                                className="text-sm font-medium text-slate-600 hover:text-primary-600 transition-colors"
+                                className={`text-sm font-medium transition-colors ${isScrolled
+                                        ? 'text-navy-100 hover:text-primary-400'
+                                        : 'text-navy-100 hover:text-white'
+                                    }`}
                             >
                                 {link.name}
                             </a>
@@ -52,10 +59,10 @@ const PublicNavbar = () => {
                     {/* Desktop Buttons */}
                     <div className="hidden md:flex items-center gap-4">
                         <Link to="/login">
-                            <Button variant="ghost" size="sm">Log In</Button>
+                            <Button variant="ghost" className={`${isScrolled ? 'text-white hover:text-primary-300' : 'text-white hover:text-primary-200'}`}>Log In</Button>
                         </Link>
                         <Link to="/register">
-                            <Button size="sm">Register</Button>
+                            <Button className="bg-primary-600 hover:bg-primary-700 text-white border-none shadow-lg shadow-primary-900/20">Register</Button>
                         </Link>
                     </div>
 
@@ -63,7 +70,7 @@ const PublicNavbar = () => {
                     <div className="md:hidden">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="text-slate-600 hover:text-slate-900 p-2"
+                            className={`p-2 ${isScrolled ? 'text-white' : 'text-white'}`}
                         >
                             {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
                         </button>
@@ -73,13 +80,13 @@ const PublicNavbar = () => {
 
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
-                <div className="md:hidden bg-white border-t border-slate-100 shadow-lg absolute w-full left-0">
+                <div className="md:hidden bg-navy-900 border-t border-navy-800 shadow-xl absolute w-full left-0">
                     <div className="px-4 pt-2 pb-6 space-y-4">
                         {navLinks.map((link) => (
                             <a
                                 key={link.name}
                                 href={link.href}
-                                className="block px-3 py-2 text-base font-medium text-slate-600 hover:text-primary-600 hover:bg-slate-50 rounded-md"
+                                className="block px-3 py-2 text-base font-medium text-navy-200 hover:text-white hover:bg-navy-800 rounded-md"
                                 onClick={() => setIsMobileMenuOpen(false)}
                             >
                                 {link.name}
@@ -87,10 +94,10 @@ const PublicNavbar = () => {
                         ))}
                         <div className="pt-4 flex flex-col gap-3">
                             <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                                <Button variant="secondary" className="w-full justify-center">Log In</Button>
+                                <Button variant="secondary" className="w-full justify-center bg-navy-800 text-white border-navy-700">Log In</Button>
                             </Link>
                             <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                                <Button className="w-full justify-center">Register</Button>
+                                <Button className="w-full justify-center bg-primary-600">Register</Button>
                             </Link>
                         </div>
                     </div>

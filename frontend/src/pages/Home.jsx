@@ -1,192 +1,268 @@
 import { useNavigate } from 'react-router-dom';
 import PublicNavbar from '../components/layout/PublicNavbar';
 import Button from '../components/ui/Button';
-import { Card, CardContent } from '../components/ui/Card';
 import {
     FileText,
     Shield,
-    Cpu,
+    Users,
     CheckCircle,
     ArrowRight,
     Lock,
     Globe,
     Activity,
-    ShieldCheck
+    Search,
+    AlertTriangle,
+    FileCheck,
+    UserCheck,
+    Megaphone
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const FeatureCard = ({ icon: Icon, title, description }) => (
+const ServiceCard = ({ icon: Icon, title, description, color = "text-primary-600", bg = "bg-primary-50" }) => (
     <motion.div
         whileHover={{ y: -5 }}
-        className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-all"
+        className="group bg-white rounded-xl border border-navy-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
     >
-        <div className="h-12 w-12 bg-primary-50 rounded-lg flex items-center justify-center mb-4">
-            <Icon className="h-6 w-6 text-primary-600" />
-        </div>
-        <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
-        <p className="text-slate-600 text-sm leading-relaxed">{description}</p>
-    </motion.div>
-);
+        <div className="p-6">
+            <div className={`h-14 w-14 ${bg} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                <Icon className={`h-7 w-7 ${color}`} />
+            </div>
+            <h3 className="text-xl font-bold text-navy-900 mb-3 group-hover:text-primary-700 transition-colors">{title}</h3>
+            <p className="text-navy-500 text-sm leading-relaxed mb-4">{description}</p>
 
-const StepCard = ({ number, title, description }) => (
-    <div className="relative flex flex-col items-center text-center p-6 bg-white rounded-xl border-l-4 border-primary-500 shadow-sm">
-        <div className="absolute -top-4 w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
-            {number}
+            <div className="flex items-center text-primary-600 font-semibold text-sm group-hover:underline">
+                Access Service <ArrowRight className="ml-2 h-4 w-4" />
+            </div>
         </div>
-        <h3 className="text-lg font-bold text-slate-900 mt-4 mb-2">{title}</h3>
-        <p className="text-slate-600 text-sm">{description}</p>
-    </div>
+    </motion.div>
 );
 
 const Home = () => {
     const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+        <div className="min-h-screen bg-navy-50 font-sans text-navy-900 selection:bg-primary-200">
             <PublicNavbar />
 
-            {/* HERO SECTION */}
-            <section id="home" className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col items-center text-center">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="max-w-3xl"
-                >
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-primary-700 text-xs font-semibold mb-6 border border-blue-100">
-                        <span className="flex h-2 w-2 rounded-full bg-primary-600 animate-pulse"></span>
-                        Official Government Initiative
+            {/* HERO SECTION - Modern Glassmorphism */}
+            <section id="home" className="relative pt-32 pb-32 overflow-hidden bg-navy-900">
+                {/* Abstract Background Shapes */}
+                <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+                    <div className="absolute -top-24 -left-24 w-96 h-96 bg-primary-600/20 rounded-full blur-3xl animate-pulse"></div>
+                    <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-accent/10 rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-primary-400/10 rounded-full blur-3xl"></div>
+                </div>
+
+                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                    >
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-navy-800/50 border border-navy-700 text-primary-300 text-sm font-medium mb-8 backdrop-blur-sm">
+                            <span className="flex h-2 w-2 rounded-full bg-accent animate-pulse"></span>
+                            Official AI-Integrated Future Policing Initiative
+                        </div>
+
+                        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+                            Smart Policing for a <br />
+                            <span className="bg-gradient-to-r from-primary-400 via-primary-200 to-white bg-clip-text text-transparent">
+                                Safer Tomorrow
+                            </span>
+                        </h1>
+
+                        <p className="text-xl text-navy-200 mb-12 max-w-2xl mx-auto font-light">
+                            Experience the next generation of law enforcement. seamless FIR filing, real-time tracking, and AI-powered investigations at your fingertips.
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                            <button
+                                onClick={() => navigate('/login')}
+                                className="gov-btn-accent text-lg px-8 py-4 shadow-lg shadow-accent/20"
+                            >
+                                File e-FIR Now
+                            </button>
+                            <button
+                                onClick={() => navigate('/login')}
+                                className="px-8 py-3.5 rounded-lg border border-navy-600 text-white font-medium hover:bg-navy-800 transition-all"
+                            >
+                                Official Login
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Glass Search Bar Overlay */}
+                <div className="absolute -bottom-8 left-0 w-full z-20 px-4">
+                    <div className="max-w-4xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20 p-4 rounded-2xl shadow-2xl flex flex-col md:flex-row gap-4 items-center">
+                        <div className="flex-1 w-full relative">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/60 h-5 w-5" />
+                            <input
+                                type="text"
+                                placeholder="Search for services, nearby stations, or officials..."
+                                className="w-full bg-navy-900/50 border border-navy-700 text-white placeholder-navy-300 rounded-xl py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+                            />
+                        </div>
+                        <div className="flex gap-2 w-full md:w-auto">
+                            <button className="flex-1 md:flex-none px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium transition-colors">
+                                Search
+                            </button>
+                        </div>
                     </div>
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 mb-6">
-                        <span className="block">AI-Assisted</span>
-                        <span className="bg-gradient-to-r from-primary-600 to-primary-400 bg-clip-text text-transparent">FIR System</span>
-                    </h1>
-                    <p className="text-lg sm:text-xl text-slate-600 mb-10 leading-relaxed max-w-2xl mx-auto">
-                        A secure, transparent, and intelligent digital platform empowering citizens to file complaints and enabling police to manage investigations efficiently.
-                    </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Button
-                            size="lg"
-                            className="px-8 text-base shadow-lg shadow-primary-500/20"
-                            onClick={() => navigate('/login')}
-                        >
-                            File a Complaint <ArrowRight className="ml-2 h-5 w-5" />
-                        </Button>
-                        <Button
-                            size="lg"
-                            variant="secondary"
-                            className="px-8 text-base"
-                            onClick={() => navigate('/login')}
-                        >
-                            Police Login
-                        </Button>
-                    </div>
-                </motion.div>
+                </div>
             </section>
 
-            {/* FEATURES SECTION */}
-            <section id="features" className="py-20 bg-white">
+            {/* NEWS TICKER */}
+            <div className="bg-navy-900 border-b border-navy-800 pt-12 pb-2">
+                <div className="max-w-7xl mx-auto px-4 flex items-center gap-4 overflow-hidden">
+                    <div className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-wider shrink-0 animate-pulse">
+                        Breaking News
+                    </div>
+                    <div className="w-full overflow-hidden whitespace-nowrap">
+                        <div className="inline-block animate-marquee text-navy-200 text-sm">
+                            <span className="mx-4">• New Cyber Crime Reporting Portal launched for faster redressal.</span>
+                            <span className="mx-4">• Annual Police Marathon scheduled for next Sunday. Registration open.</span>
+                            <span className="mx-4">• Traffic advisory: Heavy rain expected in downtown areas. Drive safely.</span>
+                            <span className="mx-4">• AI-powered surveillance system implementation begins in Phase 1.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* CITIZEN SERVICES SECTION */}
+            <section id="services" className="py-24 bg-navy-50 relative">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-slate-900 mb-4">Smart Policing Features</h2>
-                        <p className="text-slate-600 max-w-2xl mx-auto">
-                            Leveraging advanced technology to streamline the First Information Report process.
-                        </p>
+                        <h2 className="text-primary-700 font-bold tracking-wide uppercase text-sm mb-2">Public Services</h2>
+                        <h3 className="text-4xl font-extrabold text-navy-900">Citizen Centric Services</h3>
+                        <div className="w-24 h-1.5 bg-accent mx-auto mt-6 rounded-full"></div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        <FeatureCard
+                        <ServiceCard
                             icon={FileText}
-                            title="Online Complaint & Pre-FIR"
-                            description="Register complaints from anywhere, anytime. Our system guides you through the necessary details for a complete report."
+                            title="Register e-FIR"
+                            description="File a First Information Report online for lost articles, theft, or other non-heinous crimes instantly."
                         />
-                        <FeatureCard
-                            icon={Cpu}
-                            title="AI-Generated Drafts"
-                            description="Our intelligent assistant analyses your complaint description and auto-drafts a professional FIR for police review."
+                        <ServiceCard
+                            icon={Megaphone}
+                            title="Report Cyber Crime"
+                            description="Dedicated channel for reporting financial fraud, cyber bullying, and online harassment."
+                            color="text-red-500"
+                            bg="bg-red-50"
                         />
-                        <FeatureCard
-                            icon={Activity}
-                            title="Real-time Status Tracking"
-                            description="Track the progress of your complaint in real-time with granular status updates and notifications."
+                        <ServiceCard
+                            icon={UserCheck}
+                            title="Character Verification"
+                            description="Apply for police verification certificates for employment, passport, or tenant verification."
+                            color="text-green-600"
+                            bg="bg-green-50"
                         />
-                        <FeatureCard
-                            icon={Shield}
-                            title="Police Dashboard"
-                            description="A dedicated, feature-rich dashboard for officials to review, approve, and manage investigations efficiently."
+                        <ServiceCard
+                            icon={Search}
+                            title="Lost & Found"
+                            description="Search the database for recovered vehicles, mobile phones, and unidentified persons."
+                            color="text-orange-500"
+                            bg="bg-orange-50"
                         />
-                        <FeatureCard
-                            icon={Lock}
-                            title="Secure & Transparent"
-                            description="Role-based access control and encrypted data storage ensures absolute privacy and integrity of legal records."
+                        <ServiceCard
+                            icon={Users}
+                            title="Missing Persons"
+                            description="View list of missing persons or report a missing family member directly to the special cell."
+                            color="text-purple-600"
+                            bg="bg-purple-50"
                         />
-                        <FeatureCard
-                            icon={Globe}
-                            title="Multi-Language Support"
-                            description="Interface accessible in multiple regional languages to ensure every citizen can access justice easily."
+                        <ServiceCard
+                            icon={FileCheck}
+                            title="View FIR Details"
+                            description="Check the status of your lodged FIR and download copies by entering the FIR number."
+                            color="text-blue-600"
+                            bg="bg-blue-50"
                         />
                     </div>
                 </div>
             </section>
 
-            {/* HOW IT WORKS */}
-            <section id="how-it-works" className="py-20 bg-slate-50">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-slate-900 mb-4">How It Works</h2>
-                        <p className="text-slate-600">A seamless four-step process from complaint to investigation.</p>
-                    </div>
+            {/* WHY AI - Dark Modern Section */}
+            <section className="py-24 bg-navy-900 relative overflow-hidden">
+                {/* Grid Pattern */}
+                <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#4b5563 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        <StepCard number="1" title="Register" description="Citizen logs in and submits incident details with evidence." />
-                        <StepCard number="2" title="AI Processing" description="System analyzes input and generates a preliminary FIR draft." />
-                        <StepCard number="3" title="Police Review" description="Officer validates the draft, makes corrections, and approves it." />
-                        <StepCard number="4" title="Investigation" description="FIR is registered, officer assigned, and investigation begins." />
-                    </div>
-                </div>
-            </section>
-
-            {/* WHY AI */}
-            <section id="about" className="py-20 bg-white overflow-hidden">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
+                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="grid lg:grid-cols-2 gap-16 items-center">
                         <div>
-                            <h2 className="text-3xl font-bold text-slate-900 mb-6">Why AI in Law Enforcement?</h2>
+                            <div className="inline-block px-4 py-1.5 rounded-full border border-primary-500/30 bg-primary-500/10 text-primary-400 text-sm font-medium mb-6">
+                                Powered by Advanced AI
+                            </div>
+                            <h2 className="text-4xl font-extrabold text-white mb-6">Redefining Law Enforcement with Technology.</h2>
+                            <p className="text-navy-300 text-lg mb-8 leading-relaxed">
+                                Our platform integrates cutting-edge Artificial Intelligence to analyze patterns, predict hotspots, and assist officers in drafting accurate investigation reports, reducing the timeline from days to hours.
+                            </p>
+
                             <div className="space-y-4">
                                 {[
-                                    "Drastically reduces time taken to draft FIRs.",
-                                    "Minimizes human error in recording details.",
-                                    "Ensures standardized legal language usage.",
-                                    "Allows police to focus more on field investigation."
+                                    "Zero-Shot Crime Classification Models",
+                                    "Automated Legal Draft Generation",
+                                    "Real-time Predictive Analytics",
+                                    "Seamless Digital Evidence Management"
                                 ].map((item, idx) => (
-                                    <div key={idx} className="flex items-start">
-                                        <CheckCircle className="h-5 w-5 text-green-500 mt-1 mr-3 shrink-0" />
-                                        <p className="text-slate-700">{item}</p>
+                                    <div key={idx} className="flex items-center">
+                                        <div className="h-6 w-6 rounded-full bg-green-500/20 flex items-center justify-center mr-4 border border-green-500/40">
+                                            <CheckCircle className="h-4 w-4 text-green-400" />
+                                        </div>
+                                        <p className="text-navy-100 font-medium">{item}</p>
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-8">
-                                <Button onClick={() => navigate('/login')}>Get Started Now</Button>
+
+                            <button className="mt-10 text-white border-b border-primary-500 pb-1 hover:text-primary-400 transition-colors flex items-center gap-2">
+                                Read our Technology Whitepaper <ArrowRight className="h-4 w-4" />
+                            </button>
+                        </div>
+
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-gradient-to-tr from-accent/20 to-primary-500/20 rounded-2xl filter blur-xl transform translate-y-4"></div>
+                            <div className="bg-navy-800 border border-navy-700 p-1 rounded-2xl shadow-2xl relative overflow-hidden">
+                                <div className="bg-navy-950 rounded-xl p-6 font-mono text-sm h-80 overflow-y-auto custom-scrollbar">
+                                    <div className="flex gap-2 mb-4">
+                                        <span className="w-3 h-3 rounded-full bg-red-500"></span>
+                                        <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
+                                        <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                                    </div>
+                                    <div className="text-green-400 mb-2">$ git clone ai-fir-system</div>
+                                    <div className="text-blue-400 mb-2">{`> Cloning into 'ai-fir-system'...`}</div>
+                                    <div className="text-navy-400 mb-4">{`> Unpacking objects: 100% (402/402), done.`}</div>
+                                    <div className="text-white mb-2">$ ./init_neural_core.sh</div>
+                                    <div className="text-accent mb-2">{`> [SYSTEM] Connecting to Neural Core...`}</div>
+                                    <div className="text-accent mb-2">{`> [SYSTEM] Loading NLP Models (RoBERTa, GPT-4)...`}</div>
+                                    <div className="text-green-400 mb-2">{`> [SUCCESS] AI Agent Online. Ready to process complaints.`}</div>
+                                    <div className="text-white mt-4 animate-pulse">_</div>
+                                </div>
                             </div>
                         </div>
-                        <div className="relative">
-                            <div className="absolute inset-0 bg-gradient-to-tr from-primary-600/20 to-transparent rounded-2xl transform rotate-3"></div>
-                            <div className="bg-slate-900 p-8 rounded-2xl shadow-2xl relative">
-                                <pre className="text-xs text-green-400 font-mono leading-relaxed overflow-hidden">
-                                    {`> INITIALIZING AI MODULE...
-> LOADING CRIME_DATA_SETS... [OK]
-> ANALYZING INCIDENT_REPORT...
-> DETECTED TYPE: "THEFT_MOBILE"
-> CONFIDENCE SCORE: 98.4%
-> GENERATING LEGAL_DRAFT_V1...
+                    </div>
+                </div>
+            </section>
 
-SUBJECT: FIRST INFORMATION REPORT
-----------------------------------
-Based on the provided statement, 
-a cognizable offence under Section 
-379 of IPC has been identified...
-`}
-                                </pre>
+            {/* SAFETY TIP CARD */}
+            <section className="py-20 bg-white">
+                <div className="max-w-5xl mx-auto px-4">
+                    <div className="bg-gradient-to-r from-navy-900 to-navy-800 rounded-3xl p-8 md:p-12 relative overflow-hidden shadow-2xl">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16"></div>
+
+                        <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+                            <div className="bg-red-500/20 p-4 rounded-full border border-red-500/30">
+                                <AlertTriangle className="h-10 w-10 text-red-500" />
+                            </div>
+                            <div className="flex-1 text-center md:text-left">
+                                <h3 className="text-2xl font-bold text-white mb-2">Emergency Assistance Required?</h3>
+                                <p className="text-navy-200">
+                                    In case of immediate threat, medical emergency, or fire, please do not file an online complaint. Call the national emergency number immediately.
+                                </p>
+                            </div>
+                            <div className="text-center">
+                                <span className="block text-sm text-navy-300 mb-1">Emergency Number</span>
+                                <span className="block text-5xl font-black text-white tracking-widest">112</span>
                             </div>
                         </div>
                     </div>
@@ -194,40 +270,67 @@ a cognizable offence under Section
             </section>
 
             {/* FOOTER */}
-            <footer className="bg-slate-900 text-slate-300 py-12 border-t border-slate-800">
+            <footer className="bg-navy-950 text-slate-300 py-16 border-t border-navy-900">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-                        <div className="col-span-1 md:col-span-2">
-                            <div className="flex items-center gap-2 mb-4">
-                                <ShieldCheck className="h-8 w-8 text-white" />
-                                <span className="text-xl font-bold text-white">AI-FiR Sys</span>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                        <div className="col-span-1 md:col-span-1">
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="bg-white/10 p-2 rounded-lg">
+                                    <Shield className="h-8 w-8 text-white" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white leading-none">AIFIR</h3>
+                                    <span className="text-xs text-primary-400 tracking-wider">SECURE & SMART</span>
+                                </div>
                             </div>
-                            <p className="text-sm text-slate-400 max-w-sm">
-                                A Government of India initiative (Prototype) to modernize the criminal justice system through technology, ensuring efficient and transparent service delivery.
+                            <p className="text-sm text-navy-400 leading-relaxed mb-6">
+                                A next-generation law enforcement platform helping citizens and officers via AI-driven workflows.
                             </p>
+                            <div className="flex gap-4">
+                                {/* Social placeholders */}
+                                <div className="w-8 h-8 rounded-full bg-navy-800 flex items-center justify-center hover:bg-primary-600 transition-colors cursor-pointer"><Globe className="h-4 w-4 text-white" /></div>
+                            </div>
                         </div>
 
                         <div>
-                            <h4 className="text-white font-semibold mb-4">Quick Links</h4>
-                            <ul className="space-y-2 text-sm">
-                                <li><a href="#" className="hover:text-white transition-colors">Home</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-                                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                            <h4 className="text-white font-bold mb-6 flex items-center gap-2"><div className="w-1 h-4 bg-accent rounded-full"></div> Quick Links</h4>
+                            <ul className="space-y-3 text-sm text-navy-300">
+                                <li><a href="#" className="hover:text-primary-400 transition-colors flex items-center gap-2"><ArrowRight className="h-3 w-3" /> Home</a></li>
+                                <li><a href="#" className="hover:text-primary-400 transition-colors flex items-center gap-2"><ArrowRight className="h-3 w-3" /> About Department</a></li>
+                                <li><a href="#" className="hover:text-primary-400 transition-colors flex items-center gap-2"><ArrowRight className="h-3 w-3" /> Report Crime</a></li>
+                                <li><a href="#" className="hover:text-primary-400 transition-colors flex items-center gap-2"><ArrowRight className="h-3 w-3" /> FAQ</a></li>
                             </ul>
                         </div>
 
                         <div>
-                            <h4 className="text-white font-semibold mb-4">Contact & Support</h4>
-                            <p className="text-sm">Helpline: 100 / 112</p>
-                            <p className="text-sm mt-2">Email: privacy@police.gov.in</p>
-                            <p className="text-sm mt-2">New Delhi, India</p>
+                            <h4 className="text-white font-bold mb-6 flex items-center gap-2"><div className="w-1 h-4 bg-accent rounded-full"></div> Services</h4>
+                            <ul className="space-y-3 text-sm text-navy-300">
+                                <li><a href="#" className="hover:text-primary-400 transition-colors flex items-center gap-2"><ArrowRight className="h-3 w-3" /> Character Verification</a></li>
+                                <li><a href="#" className="hover:text-primary-400 transition-colors flex items-center gap-2"><ArrowRight className="h-3 w-3" /> Domestic Help Verify</a></li>
+                                <li><a href="#" className="hover:text-primary-400 transition-colors flex items-center gap-2"><ArrowRight className="h-3 w-3" /> Processions Request</a></li>
+                                <li><a href="#" className="hover:text-primary-400 transition-colors flex items-center gap-2"><ArrowRight className="h-3 w-3" /> Protest Permission</a></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 className="text-white font-bold mb-6 flex items-center gap-2"><div className="w-1 h-4 bg-accent rounded-full"></div> Contact</h4>
+                            <div className="p-4 bg-navy-900 rounded-xl border border-navy-800">
+                                <p className="text-xs text-navy-400 uppercase tracking-widest mb-1">Helpline</p>
+                                <p className="text-2xl font-bold text-white mb-4">112 / 100</p>
+
+                                <p className="text-xs text-navy-400 uppercase tracking-widest mb-1">Email</p>
+                                <p className="text-sm text-white">support@uppolice.gov.in</p>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="border-t border-slate-800 pt-8 text-center text-xs text-slate-500">
+                    <div className="border-t border-navy-900 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-navy-500">
                         <p>&copy; 2026 AI-Assisted FIR System. All rights reserved.</p>
-                        <p className="mt-2">Disclaimer: This is a demo project for educational/prototype purposes.</p>
+                        <div className="flex gap-6 mt-4 md:mt-0">
+                            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+                            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+                            <a href="#" className="hover:text-white transition-colors">Accessibility</a>
+                        </div>
                     </div>
                 </div>
             </footer>

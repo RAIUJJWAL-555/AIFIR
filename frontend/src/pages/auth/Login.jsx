@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { ShieldCheck, User, Lock, ArrowRight } from 'lucide-react';
+import { ShieldCheck, User, Lock, ArrowRight, Activity } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
@@ -40,101 +40,85 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
-            <div className="w-full max-w-md space-y-8">
+        <div className="min-h-screen bg-navy-900 flex items-center justify-center p-4 relative overflow-hidden">
+            {/* Background Decorations */}
+            <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
+                <div className="absolute top-10 left-10 w-64 h-64 bg-primary-600/20 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-10 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl"></div>
+            </div>
+
+            <div className="w-full max-w-md space-y-8 relative z-10 animate-in fade-in zoom-in duration-500">
                 <div className="text-center">
-                    <div className="mx-auto h-16 w-16 bg-primary-600 rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 mb-6">
+                    <div className="mx-auto h-20 w-20 bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 mb-6 border border-primary-500/30">
                         <ShieldCheck className="h-10 w-10 text-white" />
                     </div>
-                    <h2 className="text-3xl font-bold text-slate-900 tracking-tight">AI-Assisted FIR System</h2>
-                    <p className="mt-2 text-slate-600">Secure Justice Delivery Platform</p>
+                    <h2 className="text-3xl font-extrabold text-white tracking-tight">Access Portal</h2>
+                    <p className="mt-2 text-navy-200">AI-Assisted FIR System</p>
                 </div>
 
-                <Card className="border-t-4 border-t-primary-600 shadow-xl">
-                    <CardHeader>
-                        <CardTitle className="text-xl text-center">Welcome Back</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {/* Role Switcher */}
-                        <div className="grid grid-cols-3 gap-2 p-1 bg-slate-100 rounded-lg mb-6">
+                <div className="bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl p-8">
+                    {/* Role Switcher */}
+                    <div className="grid grid-cols-3 gap-2 p-1 bg-navy-950/50 rounded-lg mb-8 border border-white/5">
+                        {['citizen', 'police', 'admin'].map((r) => (
                             <button
+                                key={r}
                                 type="button"
-                                onClick={() => { setRole('citizen'); setIdentifier(''); }}
-                                className={`py-2 text-xs font-medium rounded-md transition-all ${role === 'citizen'
-                                    ? 'bg-white text-primary-700 shadow-sm'
-                                    : 'text-slate-500 hover:text-slate-700'
+                                onClick={() => { setRole(r); setIdentifier(''); }}
+                                className={`py-2 text-xs font-semibold rounded-md transition-all uppercase tracking-wider ${role === r
+                                    ? 'bg-primary-600 text-white shadow-md'
+                                    : 'text-navy-300 hover:text-white hover:bg-white/5'
                                     }`}
                             >
-                                Citizen
+                                {r}
                             </button>
-                            <button
-                                type="button"
-                                onClick={() => { setRole('police'); setIdentifier(''); }}
-                                className={`py-2 text-xs font-medium rounded-md transition-all ${role === 'police'
-                                    ? 'bg-white text-primary-700 shadow-sm'
-                                    : 'text-slate-500 hover:text-slate-700'
-                                    }`}
-                            >
-                                Officer
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => { setRole('admin'); setIdentifier(''); }}
-                                className={`py-2 text-xs font-medium rounded-md transition-all ${role === 'admin'
-                                    ? 'bg-white text-primary-700 shadow-sm'
-                                    : 'text-slate-500 hover:text-slate-700'
-                                    }`}
-                            >
-                                Admin
-                            </button>
+                        ))}
+                    </div>
+
+                    <form onSubmit={handleLogin} className="space-y-6">
+                        <div className="space-y-4">
+                            <div className="relative group">
+                                <User className="absolute left-3 top-3.5 h-5 w-5 text-navy-400 group-focus-within:text-primary-400 transition-colors" />
+                                <input
+                                    type={role === 'police' ? "text" : "email"}
+                                    placeholder={role === 'police' ? "Badge Number" : "Email Address"}
+                                    className="w-full bg-navy-900/50 border border-navy-700 text-white placeholder-navy-500 rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                                    value={identifier}
+                                    onChange={(e) => setIdentifier(e.target.value)}
+                                    required
+                                />
+                            </div>
+                            <div className="relative group">
+                                <Lock className="absolute left-3 top-3.5 h-5 w-5 text-navy-400 group-focus-within:text-primary-400 transition-colors" />
+                                <input
+                                    type="password"
+                                    placeholder="Enter your password"
+                                    className="w-full bg-navy-900/50 border border-navy-700 text-white placeholder-navy-500 rounded-xl py-3 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
                         </div>
 
-                        <form onSubmit={handleLogin} className="space-y-4">
-                            <div className="space-y-4">
-                                <div className="relative">
-                                    <User className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
-                                    <Input
-                                        type={role === 'police' ? "text" : "email"}
-                                        placeholder={role === 'police' ? "Badge Number" : "Email address"}
-                                        className="pl-10"
-                                        value={identifier}
-                                        onChange={(e) => setIdentifier(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                                <div className="relative">
-                                    <Lock className="absolute left-3 top-3 h-5 w-5 text-slate-400" />
-                                    <Input
-                                        type="password"
-                                        placeholder="Password"
-                                        className="pl-10"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-between text-sm">
-                                <Link to="/forgot-password" className="font-medium text-primary-600 hover:text-primary-500">
-                                    Forgot password?
+                        <div className="flex items-center justify-between text-sm">
+                            <Link to="/forgot-password" className="font-medium text-primary-400 hover:text-primary-300 transition-colors">
+                                Forgot password?
+                            </Link>
+                            {role === 'citizen' && (
+                                <Link to="/register" className="font-medium text-primary-400 hover:text-primary-300 transition-colors">
+                                    Create Account
                                 </Link>
-                                {role === 'user' && (
-                                    <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500">
-                                        Register new account
-                                    </Link>
-                                )}
-                            </div>
+                            )}
+                        </div>
 
-                            <Button type="submit" className="w-full" isLoading={isLoading}>
-                                Sign in to Dashboard <ArrowRight className="ml-2 h-4 w-4" />
-                            </Button>
-                        </form>
-                    </CardContent>
-                </Card>
+                        <Button type="submit" className="w-full h-12 text-base shadow-lg shadow-primary-900/20" isLoading={isLoading}>
+                            Sign In to Dashboard <ArrowRight className="ml-2 h-4 w-4" />
+                        </Button>
+                    </form>
+                </div>
 
-                <p className="text-center text-xs text-slate-500">
-                    Government of India &copy; 2024. All rights reserved.
+                <p className="text-center text-xs text-navy-400">
+                    Secure Justice Delivery Platform &copy; 2026.
                 </p>
             </div>
         </div>

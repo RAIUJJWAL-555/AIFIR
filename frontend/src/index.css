@@ -1,68 +1,78 @@
 @import "tailwindcss";
 
 @theme {
-  /* Primary - Deep Navy */
-  --color-primary-50:  #E6EBF2;
-  --color-primary-100: #C0CCD9;
-  --color-primary-200: #94A8BF;
-  --color-primary-300: #6985A6;
-  --color-primary-400: #40638C;
-  --color-primary-500: #1A4373;
-  --color-primary-600: #13355B;
-  --color-primary-700: #0B1F3A;
-  --color-primary-800: #071527;
-  --color-primary-900: #040B15;
-  --color-primary-950: #02060a;
+  /* Premium Police Palette */
+  --color-primary-50:  #f0f9ff;
+  --color-primary-100: #e0f2fe;
+  --color-primary-200: #bae6fd;
+  --color-primary-300: #7dd3fc;
+  --color-primary-400: #38bdf8;
+  --color-primary-500: #0ea5e9;
+  --color-primary-600: #0284c7;
+  --color-primary-700: #0369a1;
+  --color-primary-800: #075985;
+  --color-primary-900: #0c4a6e;
+  --color-primary-950: #082f49;
 
-  /* Secondary - Ash Grey */
-  --color-secondary-50:  #F2F4F7;
-  --color-secondary-100: #E2E6EA;
-  --color-secondary-200: #C5CED6;
-  --color-secondary-300: #A4B4C1;
-  --color-secondary-400: #849AAD;
-  --color-secondary-500: #1E293B;
-  --color-secondary-600: #475569;
-  --color-secondary-700: #334155;
-  --color-secondary-800: #0B1F3A;
-  --color-secondary-900: #0F172A;
+  /* Deep Navy (Backgrounds) */
+  --color-navy-50:  #f8fafc;
+  --color-navy-100: #f1f5f9;
+  --color-navy-200: #e2e8f0;
+  --color-navy-300: #cbd5e1;
+  --color-navy-400: #94a3b8;
+  --color-navy-500: #64748b;
+  --color-navy-600: #475569;
+  --color-navy-700: #334155;
+  --color-navy-800: #1e293b;
+  --color-navy-900: #0f172a;
+  --color-navy-950: #020617;
 
-  /* Accent - Government Gold */
-  --color-accent: #C9A227;
-  --color-accent-light: #E3C151;
-  --color-accent-dark: #A48218;
+  /* Accent - Badge Gold */
+  --color-accent: #fbbf24;
+  --color-accent-hover: #d97706;
+  --color-accent-light: #fcd34d;
 
   /* Text & Status */
-  --color-text: #1C1C1C;
-  --color-success: #1E7F5C;
-  --color-error: #8B1E1E;
+  --color-text-light: #f8fafc;
+  --color-text-dark: #0f172a;
+  --color-success: #10b981;
+  --color-error: #ef4444;
 }
 
 @layer base {
   body {
-    @apply antialiased font-sans text-text;
-    background-color: #F2F4F7; /* Secondary-50 */
-  }
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-bold text-primary-700 tracking-tight;
+    @apply antialiased font-sans text-navy-900 bg-navy-50;
   }
 }
 
 @layer components {
+  /* Glassmorphism */
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-lg;
+  }
+  
+  .glass-panel-dark {
+    @apply bg-navy-900/80 backdrop-blur-md border border-white/10 shadow-xl;
+  }
+
   .gov-header {
-    @apply bg-gradient-to-r from-primary-700 to-primary-900 border-b-4 border-accent shadow-md;
+    @apply bg-navy-900 text-white shadow-lg border-b border-white/10;
   }
+  
   .gov-card {
-    @apply bg-white rounded-lg shadow-sm border border-secondary-200 overflow-hidden text-sm;
+    @apply bg-white rounded-xl shadow-sm border border-navy-100 overflow-hidden transition-all duration-300 hover:shadow-md hover:-translate-y-1;
   }
+
   .gov-btn-primary {
-    @apply bg-primary-700 hover:bg-primary-800 text-white font-medium py-2 px-4 rounded shadow-sm transition-all border border-transparent;
+    @apply bg-gradient-to-r from-primary-700 to-primary-900 hover:from-primary-800 hover:to-primary-950 text-white font-medium py-2.5 px-6 rounded-lg shadow-lg hover:shadow-primary-900/20 transition-all duration-300;
   }
+
   .gov-btn-accent {
-    @apply bg-accent hover:bg-accent-dark text-black font-semibold py-2 px-4 rounded shadow-sm transition-all uppercase text-xs tracking-wider;
+    @apply bg-gradient-to-r from-accent to-accent-hover text-white font-bold py-2 px-6 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:scale-105;
   }
 }
 
-/* Custom Scrollbar for cleaner look */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -70,5 +80,5 @@
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 rounded-full hover:bg-slate-400;
+  @apply bg-navy-300 rounded-full hover:bg-navy-400;
 }
